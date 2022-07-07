@@ -2,7 +2,7 @@
 
 #include "MyProject.hpp"
 
-const std::string MODEL_PATH = "models/PinballDark/LeftButton.obj";
+const std::string MODEL_PATH = "models/PinballDark/Body.obj";
 const std::string TEXTURE_PATH = "textures/StarWarsPinball.png";
 
 // The uniform buffer object used in this example
@@ -32,8 +32,8 @@ class MyProject : public BaseProject {
 	// Here you set the main application parameters
 	void setWindowParameters() {
 		// window size, titile and initial background
-		windowWidth = 800;
-		windowHeight = 600;
+		windowWidth = 1600;
+		windowHeight = 900;
 		windowTitle = "My Project";
 		initialBackgroundColor = {0.0f, 0.0f, 0.0f, 1.0f};
 		
@@ -122,15 +122,32 @@ class MyProject : public BaseProject {
 					
 					
 		UniformBufferObject ubo{};
+
+		static float lastTime=0.0f;
+
+		float deltaT = time - lastTime;
+		lastTime = time;
+
+		static float cameraX = 6.0f;
+		static float cameraY = 5.0f;
+
+		static float value = 10.0f;
+		static float ZoomOut = 2.0f;
+
+		if(glfwGetKey(window,GLFW_KEY_D)){
+			value = value+ZoomOut*deltaT;
+		}
+		
 		ubo.model = glm::rotate(glm::mat4(1.0f),
-								time * glm::radians(90.0f),
-								glm::vec3(0.0f, 0.0f, 1.0f));
-		ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f),
-							   glm::vec3(0.0f, 0.0f, 0.0f),
-							   glm::vec3(0.0f, 0.0f, 1.0f));
+								glm::radians(-90.0f),
+								glm::vec3(0.0f, 1.0f, 0.0f));
+		ubo.view = glm::lookAt(glm::vec3(cameraX+value, cameraY+value, 0.0),
+							   glm::vec3(-30.0f, 3.0f, 0.0f),
+							   glm::vec3(0.0f, 1.0f, 0.0f));
+		
 		ubo.proj = glm::perspective(glm::radians(45.0f),
 						swapChainExtent.width / (float) swapChainExtent.height,
-						0.1f, 10.0f);
+						0.1f, 100.0f);
 		ubo.proj[1][1] *= -1;
 		
 		void* data;
