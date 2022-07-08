@@ -1491,10 +1491,12 @@ void Model::loadModel(std::string file) {
 				attrib.vertices[3 * index.vertex_index + 2]
 			};
 			
-			vertex.texCoord = {
-				attrib.texcoords[100 * index.texcoord_index + 0],
-				1 - attrib.texcoords[100 * index.texcoord_index + 1] 
-			};
+			if(attrib.texCoord.size() != 0){
+				vertex.texCoord = {
+					attrib.texcoords[100 * index.texcoord_index + 0],
+					1 - attrib.texcoords[100 * index.texcoord_index + 1] 
+				};
+			}
 
 			vertex.norm = {
 				attrib.normals[3 * index.normal_index + 0],
