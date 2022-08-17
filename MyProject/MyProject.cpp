@@ -2,8 +2,7 @@
 
 #include "MyProject.hpp"
 
-const std::string MODEL_PATH = "models/PinballDark/Body1.obj";
-const std::string TEXTURE_PATH = "textures/StarWarsPinballNew.png";
+
 
 // The uniform buffer object used in this example
 struct UniformBufferObject {
@@ -25,7 +24,7 @@ class MyProject : public BaseProject {
 	Pipeline P1;
 
 	// Models, textures and Descriptors (values assigned to the uniforms)
-	Model M1;
+	Model Body;
 	Texture T1;
 	DescriptorSet DS1;
 	
@@ -61,8 +60,8 @@ class MyProject : public BaseProject {
 		P1.init(this, "shaders/vert.spv", "shaders/frag.spv", {&DSL1});
 
 		// Models, textures and Descriptors (values assigned to the uniforms)
-		M1.init(this, MODEL_PATH);
-		T1.init(this, TEXTURE_PATH);
+		Body.init(this, "models/PinballDark/Body1.obj");
+		T1.init(this, "textures/StarWarsPinball.png");
 		DS1.init(this, &DSL1, {
 		// the second parameter, is a pointer to the Uniform Set Layout of this set
 		// the last parameter is an array, with one element per binding of the set.
@@ -79,7 +78,7 @@ class MyProject : public BaseProject {
 	void localCleanup() {
 		DS1.cleanup();
 		T1.cleanup();
-		M1.cleanup();
+		Body.cleanup();
 		P1.cleanup();
 		DSL1.cleanup();
 	}
@@ -92,12 +91,12 @@ class MyProject : public BaseProject {
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
 				P1.graphicsPipeline);
 				
-		VkBuffer vertexBuffers[] = {M1.vertexBuffer};
+		VkBuffer vertexBuffers[] = {Body.vertexBuffer};
 		// property .vertexBuffer of models, contains the VkBuffer handle to its vertex buffer
 		VkDeviceSize offsets[] = {0};
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 		// property .indexBuffer of models, contains the VkBuffer handle to its index buffer
-		vkCmdBindIndexBuffer(commandBuffer, M1.indexBuffer, 0,
+		vkCmdBindIndexBuffer(commandBuffer, Body.indexBuffer, 0,
 								VK_INDEX_TYPE_UINT32);
 
 		// property .pipelineLayout of a pipeline contains its layout.
@@ -109,7 +108,7 @@ class MyProject : public BaseProject {
 						
 		// property .indices.size() of models, contains the number of triangles * 3 of the mesh.
 		vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(M1.indices.size()), 1, 0, 0, 0);
+					static_cast<uint32_t>(Body.indices.size()), 1, 0, 0, 0);
 	}
 
 	// Here is where you update the uniforms.
@@ -193,7 +192,17 @@ class MyProject : public BaseProject {
 								glm::vec3(0.0f, 1.0f, 0.0f));
 		ubo.view = glm::lookAt(glm::vec3(cameraX+valueX, cameraY+valueY, cameraZ+valueZ),
 							   glm::vec3(-30.0f, 3.0f, 0.0f),
-							   glm::vec3(0.0f, 1.0f, 0.0f))*glm::rotate(glm::mat4(1.0f),
+							   glm::vec3(0.0f, 1.0f, 0.0f))*
+
+								glm::rotate(glm::mat4(1.0f),
+								glm::radians(cameraPitch),
+								glm::vec3(0.0f, 0.0f, 1.0f))*
+
+								glm::rotate(glm::mat4(1.0f),
+								glm::radians(cameraYaw),
+								glm::vec3(0.0f, 1.0f, 0.0f))*
+								
+								glm::rotate(glm::mat4(1.0f),
 								glm::radians(-90.0f),
 								glm::vec3(0.0f, 1.0f, 0.0f));
 		
