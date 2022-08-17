@@ -25,7 +25,7 @@ class MyProject : public BaseProject {
 
 	// Models, textures and Descriptors (values assigned to the uniforms)
 	Model Body;
-	Texture T1;
+	Texture BodyTexture;
 	DescriptorSet DS1;
 	
 	// Here you set the main application parameters
@@ -61,7 +61,7 @@ class MyProject : public BaseProject {
 
 		// Models, textures and Descriptors (values assigned to the uniforms)
 		Body.init(this, "models/PinballDark/Body1.obj");
-		T1.init(this, "textures/StarWarsPinball.png");
+		BodyTexture.init(this, "textures/StarWarsPinball.png");
 		DS1.init(this, &DSL1, {
 		// the second parameter, is a pointer to the Uniform Set Layout of this set
 		// the last parameter is an array, with one element per binding of the set.
@@ -70,14 +70,14 @@ class MyProject : public BaseProject {
 		// third  element : only for UNIFORMs, the size of the corresponding C++ object
 		// fourth element : only for TEXTUREs, the pointer to the corresponding texture object
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-					{1, TEXTURE, 0, &T1}
+					{1, TEXTURE, 0, &BodyTexture}
 				});
 	}
 
 	// Here you destroy all the objects you created!		
 	void localCleanup() {
 		DS1.cleanup();
-		T1.cleanup();
+		BodyTexture.cleanup();
 		Body.cleanup();
 		P1.cleanup();
 		DSL1.cleanup();
