@@ -2,8 +2,8 @@
 
 #include "MyProject.hpp"
 
-const std::string MODEL_PATH = "models/PinballDark/Body.obj";
-const std::string TEXTURE_PATH = "textures/StarWarsPinball.png";
+const std::string MODEL_PATH = "models/PinballDark/Body1.obj";
+const std::string TEXTURE_PATH = "textures/StarWarsPinballNew.png";
 
 // The uniform buffer object used in this example
 struct UniformBufferObject {
@@ -35,7 +35,7 @@ class MyProject : public BaseProject {
 		windowWidth = 1600;
 		windowHeight = 900;
 		windowTitle = "My Project";
-		initialBackgroundColor = {0.0f, 0.0f, 0.0f, 1.0f};
+		initialBackgroundColor = {1.0f, 1.0f, 1.0f, 1.0f};
 		
 		// Descriptor pool sizes
 		uniformBlocksInPool = 1;
@@ -130,20 +130,44 @@ class MyProject : public BaseProject {
 
 		static float cameraX = 6.0f;
 		static float cameraY = 5.0f;
+		static float cameraZ = 6.0f;
 
-		static float value = 10.0f;
+		static float valueX = 10.0f;
+		static float valueY = 10.0f;
+		static float valueZ = 10.0f;
 		static float ZoomOut = 2.0f;
 
 		if(glfwGetKey(window,GLFW_KEY_D)){
-			value = value+ZoomOut*deltaT;
+			valueZ = valueZ-ZoomOut*deltaT;
+		}
+		if(glfwGetKey(window,GLFW_KEY_A)){
+			valueZ = valueZ+ZoomOut*deltaT;
+		}
+
+
+		if(glfwGetKey(window,GLFW_KEY_W)){
+			valueX = valueX-ZoomOut*deltaT;
+		}
+		if(glfwGetKey(window,GLFW_KEY_S)){
+			valueX = valueX+ZoomOut*deltaT;
+		}
+
+
+		if(glfwGetKey(window,GLFW_KEY_R)){
+			valueY = valueY+ZoomOut*deltaT;
+		}
+		if(glfwGetKey(window,GLFW_KEY_F)){
+			valueY = valueY-ZoomOut*deltaT;
 		}
 		
 		ubo.model = glm::rotate(glm::mat4(1.0f),
+								glm::radians(0.0f),
+								glm::vec3(0.0f, 1.0f, 0.0f));
+		ubo.view = glm::lookAt(glm::vec3(cameraX+valueX, cameraY+valueY, 0.0+valueZ),
+							   glm::vec3(-30.0f, 3.0f, 0.0f),
+							   glm::vec3(0.0f, 1.0f, 0.0f))*glm::rotate(glm::mat4(1.0f),
 								glm::radians(-90.0f),
 								glm::vec3(0.0f, 1.0f, 0.0f));
-		ubo.view = glm::lookAt(glm::vec3(cameraX+value, cameraY+value, 0.0),
-							   glm::vec3(-30.0f, 3.0f, 0.0f),
-							   glm::vec3(0.0f, 1.0f, 0.0f));
 		
 		ubo.proj = glm::perspective(glm::radians(45.0f),
 						swapChainExtent.width / (float) swapChainExtent.height,
