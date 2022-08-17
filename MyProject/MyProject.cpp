@@ -130,13 +130,22 @@ class MyProject : public BaseProject {
 
 		static float cameraX = 6.0f;
 		static float cameraY = 5.0f;
-		static float cameraZ = 6.0f;
+		static float cameraZ = -10.0f;
+
+		static float cameraPitch = 0.0f;
+		static float cameraYaw = 0.0f;
+		static float cameraRotationSpeed = 10.0f;
+		
 
 		static float valueX = 10.0f;
 		static float valueY = 10.0f;
 		static float valueZ = 10.0f;
 		static float ZoomOut = 2.0f;
 
+		
+		/* 
+			Camera Linear Movement
+		 */
 		if(glfwGetKey(window,GLFW_KEY_D)){
 			valueZ = valueZ-ZoomOut*deltaT;
 		}
@@ -159,11 +168,30 @@ class MyProject : public BaseProject {
 		if(glfwGetKey(window,GLFW_KEY_F)){
 			valueY = valueY-ZoomOut*deltaT;
 		}
+
+		/* 
+			Camera Rotation Movement
+		 */
+		if(glfwGetKey(window,GLFW_KEY_UP)){
+			cameraPitch = cameraPitch+cameraRotationSpeed*deltaT;
+		}
+		if(glfwGetKey(window,GLFW_KEY_DOWN)){
+			cameraPitch = cameraPitch-cameraRotationSpeed*deltaT;
+		}
+
+
+		if(glfwGetKey(window,GLFW_KEY_LEFT)){
+			cameraYaw = cameraYaw+cameraRotationSpeed*deltaT;
+		}
+		if(glfwGetKey(window,GLFW_KEY_RIGHT)){
+			cameraYaw = cameraYaw-cameraRotationSpeed*deltaT;
+		}
+
 		
 		ubo.model = glm::rotate(glm::mat4(1.0f),
 								glm::radians(0.0f),
 								glm::vec3(0.0f, 1.0f, 0.0f));
-		ubo.view = glm::lookAt(glm::vec3(cameraX+valueX, cameraY+valueY, 0.0+valueZ),
+		ubo.view = glm::lookAt(glm::vec3(cameraX+valueX, cameraY+valueY, cameraZ+valueZ),
 							   glm::vec3(-30.0f, 3.0f, 0.0f),
 							   glm::vec3(0.0f, 1.0f, 0.0f))*glm::rotate(glm::mat4(1.0f),
 								glm::radians(-90.0f),
