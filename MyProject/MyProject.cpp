@@ -26,7 +26,11 @@ class MyProject : public BaseProject {
 	// Models, textures and Descriptors (values assigned to the uniforms)
 	Model Body;
 	Texture BodyTexture;
-	DescriptorSet DS1;
+	DescriptorSet DSBody;
+
+	Model Puller;
+	Texture PullerTexture;
+	DescriptorSet DSPuller;
 	
 	// Here you set the main application parameters
 	void setWindowParameters() {
@@ -37,9 +41,9 @@ class MyProject : public BaseProject {
 		initialBackgroundColor = {1.0f, 1.0f, 1.0f, 1.0f};
 		
 		// Descriptor pool sizes
-		uniformBlocksInPool = 1;
-		texturesInPool = 1;
-		setsInPool = 1;
+		uniformBlocksInPool = 2;
+		texturesInPool = 2;
+		setsInPool = 2;
 	}
 	
 	// Here you load and setup all your Vulkan objects
@@ -62,7 +66,9 @@ class MyProject : public BaseProject {
 		// Models, textures and Descriptors (values assigned to the uniforms)
 		Body.init(this, "models/PinballDark/Body1.obj");
 		BodyTexture.init(this, "textures/StarWarsPinball.png");
-		DS1.init(this, &DSL1, {
+
+
+		DSBody.init(this, &DSL1, {
 		// the second parameter, is a pointer to the Uniform Set Layout of this set
 		// the last parameter is an array, with one element per binding of the set.
 		// first  elmenet : the binding number
@@ -72,15 +78,32 @@ class MyProject : public BaseProject {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &BodyTexture}
 				});
+
+				
+		Puller.init(this, "models/PinballDark/Puller.obj");
+		PullerTexture.init(this, "textures/StarWarsPinballColors.png");
+
+		DSPuller.init(this, &DSL1, {
+					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+					{1, TEXTURE, 0, &PullerTexture}
+				});
+
+		
 	}
 
 	// Here you destroy all the objects you created!		
 	void localCleanup() {
-		DS1.cleanup();
+		DSBody.cleanup();
 		BodyTexture.cleanup();
 		Body.cleanup();
-		P1.cleanup();
+		
+
+		DSPuller.cleanup();
+		PullerTexture.cleanup();
+		Puller.cleanup();
+
 		DSL1.cleanup();
+		P1.cleanup();
 	}
 	
 	// Here it is the creation of the command buffer:
@@ -103,12 +126,32 @@ class MyProject : public BaseProject {
 		// property .descriptorSets of a descriptor set contains its elements.
 		vkCmdBindDescriptorSets(commandBuffer,
 						VK_PIPELINE_BIND_POINT_GRAPHICS,
-						P1.pipelineLayout, 0, 1, &DS1.descriptorSets[currentImage],
+						P1.pipelineLayout, 0, 1, &DSBody.descriptorSets[currentImage],
+						0, nullptr);
+		
+		// property .indices.size() of models, contains the number of triangles * 3 of the mesh.
+		vkCmdDrawIndexed(commandBuffer,
+					static_cast<uint32_t>(Body.indices.size()), 1, 0, 0, 0);
+
+				
+		VkBuffer vertexBuffersPuller[] = {Puller.vertexBuffer};
+		// property .vertexBuffer of models, contains the VkBuffer handle to its vertex buffer
+		VkDeviceSize offsetsPuller[] = {0};
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffersPuller, offsetsPuller);
+		// property .indexBuffer of models, contains the VkBuffer handle to its index buffer
+		vkCmdBindIndexBuffer(commandBuffer, Puller.indexBuffer, 0,
+								VK_INDEX_TYPE_UINT32);
+
+		vkCmdBindDescriptorSets(commandBuffer,
+						VK_PIPELINE_BIND_POINT_GRAPHICS,
+						P1.pipelineLayout, 0, 1, &DSPuller.descriptorSets[currentImage],
 						0, nullptr);
 						
 		// property .indices.size() of models, contains the number of triangles * 3 of the mesh.
 		vkCmdDrawIndexed(commandBuffer,
-					static_cast<uint32_t>(Body.indices.size()), 1, 0, 0, 0);
+					static_cast<uint32_t>(Puller.indices.size()), 1, 0, 0, 0);
+
+					
 	}
 
 	// Here is where you update the uniforms.
@@ -214,10 +257,17 @@ class MyProject : public BaseProject {
 		void* data;
 
 		// Here is where you actually update your uniforms
-		vkMapMemory(device, DS1.uniformBuffersMemory[0][currentImage], 0,
+		ubo.model = glm::mat4(1.0f);
+		vkMapMemory(device, DSBody.uniformBuffersMemory[0][currentImage], 0,
 							sizeof(ubo), 0, &data);
 		memcpy(data, &ubo, sizeof(ubo));
-		vkUnmapMemory(device, DS1.uniformBuffersMemory[0][currentImage]);
+		vkUnmapMemory(device, DSBody.uniformBuffersMemory[0][currentImage]);
+
+		ubo.model = glm::mat4(1.0f);
+		vkMapMemory(device, DSPuller.uniformBuffersMemory[0][currentImage], 0,
+							sizeof(ubo), 0, &data);
+		memcpy(data, &ubo, sizeof(ubo));
+		vkUnmapMemory(device, DSPuller.uniformBuffersMemory[0][currentImage]);
 	}	
 };
 
