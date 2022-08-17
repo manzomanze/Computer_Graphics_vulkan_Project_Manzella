@@ -7,6 +7,7 @@ VulkanTest: MyProject.cpp
 .PHONY: test clean
 
 test: Vulkan
+	g++ $(CFLAGS) $(INC) -o Vulkan MyProject.cpp $(LDFLAGS)
 	./Vulkan
 
 gdb: Vulkan

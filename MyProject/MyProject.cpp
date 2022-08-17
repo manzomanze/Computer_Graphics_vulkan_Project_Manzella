@@ -80,7 +80,7 @@ class MyProject : public BaseProject {
 				});
 
 				
-		Puller.init(this, "models/PinballDark/Puller.obj");
+		Puller.init(this, "models/PinballDark/Puller1.obj");
 		PullerTexture.init(this, "textures/StarWarsPinballColors.png");
 
 		DSPuller.init(this, &DSL1, {
@@ -170,45 +170,50 @@ class MyProject : public BaseProject {
 		float deltaT = time - lastTime;
 		lastTime = time;
 
-		static float cameraX = 6.0f;
-		static float cameraY = 5.0f;
-		static float cameraZ = -10.0f;
+		static float cameraX = 0.0f;
+		static float cameraY = 0.0f;
+		static float cameraZ = 0.0f;
 
 		static float cameraPitch = 0.0f;
 		static float cameraYaw = 0.0f;
 		static float cameraRotationSpeed = 10.0f;
 		
 
-		static float valueX = 10.0f;
-		static float valueY = 10.0f;
-		static float valueZ = 10.0f;
-		static float ZoomOut = 2.0f;
+		static float valueX = 0.0f;
+		static float valueY = 0.0f;
+		static float valueZ = 0.0f;
+		static float zoomOut = 2.0f;
+
+		static float pullerMax = 2.0f;
+		static float pullerDistanceCovered = 0.0f;
+		static float pullSpeed = 2.0f;
+		static float springSpeed = 10.0f;
 
 		
 		/* 
 			Camera Linear Movement
 		 */
 		if(glfwGetKey(window,GLFW_KEY_D)){
-			valueZ = valueZ-ZoomOut*deltaT;
+			valueZ = valueZ-zoomOut*deltaT;
 		}
 		if(glfwGetKey(window,GLFW_KEY_A)){
-			valueZ = valueZ+ZoomOut*deltaT;
+			valueZ = valueZ+zoomOut*deltaT;
 		}
 
 
 		if(glfwGetKey(window,GLFW_KEY_W)){
-			valueX = valueX-ZoomOut*deltaT;
+			valueX = valueX-zoomOut*deltaT;
 		}
 		if(glfwGetKey(window,GLFW_KEY_S)){
-			valueX = valueX+ZoomOut*deltaT;
+			valueX = valueX+zoomOut*deltaT;
 		}
 
 
 		if(glfwGetKey(window,GLFW_KEY_R)){
-			valueY = valueY+ZoomOut*deltaT;
+			valueY = valueY+zoomOut*deltaT;
 		}
 		if(glfwGetKey(window,GLFW_KEY_F)){
-			valueY = valueY-ZoomOut*deltaT;
+			valueY = valueY-zoomOut*deltaT;
 		}
 
 		/* 
@@ -229,12 +234,21 @@ class MyProject : public BaseProject {
 			cameraYaw = cameraYaw-cameraRotationSpeed*deltaT;
 		}
 
+		if(glfwGetKey(window,GLFW_KEY_SPACE)){
+			if(pullerDistanceCovered<=0.8f){
+				pullerDistanceCovered = pullerDistanceCovered+pullSpeed*deltaT;
+			}
+		}else{
+			if(pullerDistanceCovered>=0.0f){
+				pullerDistanceCovered = pullerDistanceCovered-springSpeed*deltaT;
+			}
+		}
 		
 		ubo.model = glm::rotate(glm::mat4(1.0f),
-								glm::radians(0.0f),
-								glm::vec3(0.0f, 1.0f, 0.0f));
-		ubo.view = glm::lookAt(glm::vec3(cameraX+valueX, cameraY+valueY, cameraZ+valueZ),
-							   glm::vec3(-30.0f, 3.0f, 0.0f),
+								glm::radians(-90.0f),
+								glm::vec3(0.0f, 1.0f, 0.0f));;
+		ubo.view = glm::lookAt(glm::vec3(11.0f+cameraX+valueX, 18.0f+cameraY+valueY, cameraZ+valueZ),
+							   glm::vec3(5.0f+cameraX, 12.0f+cameraY, 0.0f+cameraZ),
 							   glm::vec3(0.0f, 1.0f, 0.0f))*
 
 								glm::rotate(glm::mat4(1.0f),
@@ -243,13 +257,9 @@ class MyProject : public BaseProject {
 
 								glm::rotate(glm::mat4(1.0f),
 								glm::radians(cameraYaw),
-								glm::vec3(0.0f, 1.0f, 0.0f))*
-								
-								glm::rotate(glm::mat4(1.0f),
-								glm::radians(-90.0f),
 								glm::vec3(0.0f, 1.0f, 0.0f));
 		
-		ubo.proj = glm::perspective(glm::radians(45.0f),
+		ubo.proj = glm::perspective(glm::radians(70.0f),
 						swapChainExtent.width / (float) swapChainExtent.height,
 						0.1f, 100.0f);
 		ubo.proj[1][1] *= -1;
@@ -257,13 +267,17 @@ class MyProject : public BaseProject {
 		void* data;
 
 		// Here is where you actually update your uniforms
-		ubo.model = glm::mat4(1.0f);
+		//Body
 		vkMapMemory(device, DSBody.uniformBuffersMemory[0][currentImage], 0,
 							sizeof(ubo), 0, &data);
 		memcpy(data, &ubo, sizeof(ubo));
 		vkUnmapMemory(device, DSBody.uniformBuffersMemory[0][currentImage]);
 
-		ubo.model = glm::mat4(1.0f);
+		//Puller Position
+		ubo.model = glm::translate(glm::mat4(1.0f),glm::vec3(7.10f+pullerDistanceCovered, 8.5f, -2.5f))*
+					glm::rotate(glm::mat4(1.0f),
+								glm::radians(-90.0f),
+								glm::vec3(0.0f, 0.0f, 1.0f));
 		vkMapMemory(device, DSPuller.uniformBuffersMemory[0][currentImage], 0,
 							sizeof(ubo), 0, &data);
 		memcpy(data, &ubo, sizeof(ubo));
