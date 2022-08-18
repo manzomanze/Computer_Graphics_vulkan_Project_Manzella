@@ -31,6 +31,10 @@ class MyProject : public BaseProject {
 	Model Puller;
 	Texture PullerTexture;
 	DescriptorSet DSPuller;
+
+	Model Ball;
+	Texture BallTexture;
+	DescriptorSet DSBall;
 	
 	// Here you set the main application parameters
 	void setWindowParameters() {
@@ -41,9 +45,9 @@ class MyProject : public BaseProject {
 		initialBackgroundColor = {1.0f, 1.0f, 1.0f, 1.0f};
 		
 		// Descriptor pool sizes
-		uniformBlocksInPool = 2;
-		texturesInPool = 2;
-		setsInPool = 2;
+		uniformBlocksInPool = 3;
+		texturesInPool = 3;
+		setsInPool = 3;
 	}
 	
 	// Here you load and setup all your Vulkan objects
@@ -64,7 +68,7 @@ class MyProject : public BaseProject {
 		P1.init(this, "shaders/vert.spv", "shaders/frag.spv", {&DSL1});
 
 		// Models, textures and Descriptors (values assigned to the uniforms)
-		Body.init(this, "models/PinballDark/Body1.obj");
+		Body.init(this, "models/PinballDark/BodyFlat.obj");
 		BodyTexture.init(this, "textures/StarWarsPinball.png");
 
 
@@ -87,6 +91,16 @@ class MyProject : public BaseProject {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &PullerTexture}
 				});
+		
+
+		Ball.init(this, "models/PinballDark/BallColored.obj");
+		BallTexture.init(this, "textures/StarWarsPinballColors.png");
+
+
+		DSBall.init(this, &DSL1, {
+					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+					{1, TEXTURE, 0, &BallTexture}
+				});
 
 		
 	}
@@ -101,6 +115,10 @@ class MyProject : public BaseProject {
 		DSPuller.cleanup();
 		PullerTexture.cleanup();
 		Puller.cleanup();
+
+		DSBall.cleanup();
+		BallTexture.cleanup();
+		Ball.cleanup();
 
 		DSL1.cleanup();
 		P1.cleanup();
@@ -133,12 +151,10 @@ class MyProject : public BaseProject {
 		vkCmdDrawIndexed(commandBuffer,
 					static_cast<uint32_t>(Body.indices.size()), 1, 0, 0, 0);
 
-				
+		// Puller
 		VkBuffer vertexBuffersPuller[] = {Puller.vertexBuffer};
-		// property .vertexBuffer of models, contains the VkBuffer handle to its vertex buffer
 		VkDeviceSize offsetsPuller[] = {0};
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffersPuller, offsetsPuller);
-		// property .indexBuffer of models, contains the VkBuffer handle to its index buffer
 		vkCmdBindIndexBuffer(commandBuffer, Puller.indexBuffer, 0,
 								VK_INDEX_TYPE_UINT32);
 
@@ -147,9 +163,25 @@ class MyProject : public BaseProject {
 						P1.pipelineLayout, 0, 1, &DSPuller.descriptorSets[currentImage],
 						0, nullptr);
 						
-		// property .indices.size() of models, contains the number of triangles * 3 of the mesh.
 		vkCmdDrawIndexed(commandBuffer,
 					static_cast<uint32_t>(Puller.indices.size()), 1, 0, 0, 0);
+
+
+		// Ball
+		VkBuffer vertexBuffersBall[] = {Ball.vertexBuffer};
+		VkDeviceSize offsetsBall[] = {0};
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffersBall, offsetsBall);
+		vkCmdBindIndexBuffer(commandBuffer, Ball.indexBuffer, 0,
+								VK_INDEX_TYPE_UINT32);
+
+		vkCmdBindDescriptorSets(commandBuffer,
+						VK_PIPELINE_BIND_POINT_GRAPHICS,
+						P1.pipelineLayout, 0, 1, &DSBall.descriptorSets[currentImage],
+						0, nullptr);
+						
+		vkCmdDrawIndexed(commandBuffer,
+					static_cast<uint32_t>(Ball.indices.size()), 1, 0, 0, 0);
+
 
 					
 	}
@@ -190,65 +222,104 @@ class MyProject : public BaseProject {
 		static float springSpeed = 10.0f;
 
 		
+		
+		static float ballSpeed = 0.5f;
+		static float ballX = 0.0f;
+		static float ballZ = 0.0f;
+
+
+		static float rightZMargin = -2.62219f;
+		static float leftZMargin = 2.41449f;
+		static float topXMargin = -5.45043f;
+
+		static float ballXstart = 4.30643f;
+		static float ballZstart = -2.0f;
+		static float ballRadius = 0.15f;
+				
 		/* 
 			Camera Linear Movement
 		 */
-		if(glfwGetKey(window,GLFW_KEY_D)){
-			valueZ = valueZ-zoomOut*deltaT;
-		}
-		if(glfwGetKey(window,GLFW_KEY_A)){
-			valueZ = valueZ+zoomOut*deltaT;
-		}
+		{
+			if(glfwGetKey(window,GLFW_KEY_D)){
+				valueZ = valueZ-zoomOut*deltaT;
+			}
+			if(glfwGetKey(window,GLFW_KEY_A)){
+				valueZ = valueZ+zoomOut*deltaT;
+			}
 
 
-		if(glfwGetKey(window,GLFW_KEY_W)){
-			valueX = valueX-zoomOut*deltaT;
-		}
-		if(glfwGetKey(window,GLFW_KEY_S)){
-			valueX = valueX+zoomOut*deltaT;
-		}
+			if(glfwGetKey(window,GLFW_KEY_W)){
+				valueX = valueX-zoomOut*deltaT;
+			}
+			if(glfwGetKey(window,GLFW_KEY_S)){
+				valueX = valueX+zoomOut*deltaT;
+			}
 
 
-		if(glfwGetKey(window,GLFW_KEY_R)){
-			valueY = valueY+zoomOut*deltaT;
+			if(glfwGetKey(window,GLFW_KEY_R)){
+				valueY = valueY+zoomOut*deltaT;
+			}
+			if(glfwGetKey(window,GLFW_KEY_F)){
+				valueY = valueY-zoomOut*deltaT;
+			}
 		}
-		if(glfwGetKey(window,GLFW_KEY_F)){
-			valueY = valueY-zoomOut*deltaT;
-		}
-
 		/* 
 			Camera Rotation Movement
 		 */
-		if(glfwGetKey(window,GLFW_KEY_UP)){
-			cameraPitch = cameraPitch+cameraRotationSpeed*deltaT;
-		}
-		if(glfwGetKey(window,GLFW_KEY_DOWN)){
-			cameraPitch = cameraPitch-cameraRotationSpeed*deltaT;
-		}
-
-
-		if(glfwGetKey(window,GLFW_KEY_LEFT)){
-			cameraYaw = cameraYaw+cameraRotationSpeed*deltaT;
-		}
-		if(glfwGetKey(window,GLFW_KEY_RIGHT)){
-			cameraYaw = cameraYaw-cameraRotationSpeed*deltaT;
-		}
-
-		if(glfwGetKey(window,GLFW_KEY_SPACE)){
-			if(pullerDistanceCovered<=0.8f){
-				pullerDistanceCovered = pullerDistanceCovered+pullSpeed*deltaT;
+		{
+			if(glfwGetKey(window,GLFW_KEY_UP)){
+				cameraPitch = cameraPitch+cameraRotationSpeed*deltaT;
 			}
-		}else{
-			if(pullerDistanceCovered>=0.0f){
-				pullerDistanceCovered = pullerDistanceCovered-springSpeed*deltaT;
+			if(glfwGetKey(window,GLFW_KEY_DOWN)){
+				cameraPitch = cameraPitch-cameraRotationSpeed*deltaT;
+			}
+
+
+			if(glfwGetKey(window,GLFW_KEY_LEFT)){
+				cameraYaw = cameraYaw+cameraRotationSpeed*deltaT;
+			}
+			if(glfwGetKey(window,GLFW_KEY_RIGHT)){
+				cameraYaw = cameraYaw-cameraRotationSpeed*deltaT;
 			}
 		}
+
+		/* 
+			Puller 
+		*/
+		{
+			if(glfwGetKey(window,GLFW_KEY_SPACE)){
+				if(pullerDistanceCovered<=0.8f){
+					pullerDistanceCovered = pullerDistanceCovered+pullSpeed*deltaT;
+					
+				}
+			}else{
+				if(pullerDistanceCovered>=0.0f){
+					pullerDistanceCovered = pullerDistanceCovered-springSpeed*deltaT;
+					
+				}
+			}
+		}
+
 		
+
+		ballX = ballX-ballSpeed*deltaT;
+
+
+
+		glm::vec3 PullerCurrentPosition = glm::vec3(ballXstart+1.6f+pullerDistanceCovered, ballRadius, ballZstart);
+
+		glm::vec3 BallReady = glm::vec3(ballXstart+ballRadius, ballRadius, ballZstart);
+		glm::vec3 BallCurrentPosition = glm::vec3(BallReady.x+ballX, BallReady.y, BallReady.z);
+
+		std::cout<<BallCurrentPosition.x;
+		
+
 		ubo.model = glm::rotate(glm::mat4(1.0f),
 								glm::radians(-90.0f),
-								glm::vec3(0.0f, 1.0f, 0.0f));;
-		ubo.view = glm::lookAt(glm::vec3(11.0f+cameraX+valueX, 18.0f+cameraY+valueY, cameraZ+valueZ),
-							   glm::vec3(5.0f+cameraX, 12.0f+cameraY, 0.0f+cameraZ),
+								glm::vec3(0.0f, 1.0f, 0.0f));
+		// Camera Position parallell to the playing plane
+		ubo.view = glm::lookAt(glm::vec3(5.0f+cameraX+valueX, 0.0f+cameraY+valueY, cameraZ+valueZ),
+							   glm::vec3(0.0f+cameraX, 0.0f+cameraY, 0.0f+cameraZ),
 							   glm::vec3(0.0f, 1.0f, 0.0f))*
 
 								glm::rotate(glm::mat4(1.0f),
@@ -274,7 +345,7 @@ class MyProject : public BaseProject {
 		vkUnmapMemory(device, DSBody.uniformBuffersMemory[0][currentImage]);
 
 		//Puller Position
-		ubo.model = glm::translate(glm::mat4(1.0f),glm::vec3(7.10f+pullerDistanceCovered, 8.5f, -2.5f))*
+		ubo.model = glm::translate(glm::mat4(1.0f),PullerCurrentPosition)*
 					glm::rotate(glm::mat4(1.0f),
 								glm::radians(-90.0f),
 								glm::vec3(0.0f, 0.0f, 1.0f));
@@ -282,6 +353,14 @@ class MyProject : public BaseProject {
 							sizeof(ubo), 0, &data);
 		memcpy(data, &ubo, sizeof(ubo));
 		vkUnmapMemory(device, DSPuller.uniformBuffersMemory[0][currentImage]);
+
+		//Ball Position
+		ubo.model = glm::translate(glm::mat4(1.0f),BallCurrentPosition);
+					
+		vkMapMemory(device, DSBall.uniformBuffersMemory[0][currentImage], 0,
+							sizeof(ubo), 0, &data);
+		memcpy(data, &ubo, sizeof(ubo));
+		vkUnmapMemory(device, DSBall.uniformBuffersMemory[0][currentImage]);
 	}	
 };
 
