@@ -103,6 +103,27 @@ struct SwapChainSupportDetails {
 };
 
 
+struct ObjectDimensions{
+	float minX;
+	float maxX;
+	float minZ;
+	float maxZ;
+};
+
+
+
+struct MovingObjectDimensions: ObjectDimensions {
+	float speedX;
+	float speedZ;
+};
+
+
+bool intersect(ObjectDimensions a, ObjectDimensions b) {
+  return (a.minX <= b.maxX && a.maxX >= b.minX) &&
+         (a.minZ <= b.maxZ && a.maxZ >= b.minZ);
+         
+}
+
 //// For debugging - Lesson 22.0
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
 			const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,

@@ -12,6 +12,7 @@ struct UniformBufferObject {
 };
 
 
+
 // MAIN ! 
 class MyProject : public BaseProject {
 	protected:
@@ -220,10 +221,10 @@ class MyProject : public BaseProject {
 		static float pullerDistanceCovered = 0.0f;
 		static float pullSpeed = 2.0f;
 		static float springSpeed = 10.0f;
-
+		static float launchBallSpeed = 0.0f;
 		
 		
-		static float ballSpeed = 0.5f;
+		
 		static float ballX = 0.0f;
 		static float ballZ = 0.0f;
 
@@ -235,7 +236,12 @@ class MyProject : public BaseProject {
 		static float ballXstart = 4.30643f;
 		static float ballZstart = -2.0f;
 		static float ballRadius = 0.15f;
-				
+
+		static MovingObjectDimensions Ball;
+		static ObjectDimensions TopWall;
+		static auto previousReleaseValueOfSpace = GLFW_RELEASE;
+
+		///Ball.speedX = 0.0f;
 		/* 
 			Camera Linear Movement
 		 */
@@ -298,11 +304,17 @@ class MyProject : public BaseProject {
 					
 				}
 			}
+			if(glfwGetKey(window,GLFW_KEY_SPACE) == GLFW_RELEASE && previousReleaseValueOfSpace == GLFW_PRESS){
+				launchBallSpeed = pullerDistanceCovered*4.0f;
+				Ball.speedX = launchBallSpeed;
+			}
+			previousReleaseValueOfSpace = glfwGetKey(window,GLFW_KEY_SPACE);
 		}
+	
 
 		
 
-		ballX = ballX-ballSpeed*deltaT;
+		ballX = ballX-Ball.speedX*deltaT;
 
 
 
@@ -311,7 +323,20 @@ class MyProject : public BaseProject {
 		glm::vec3 BallReady = glm::vec3(ballXstart+ballRadius, ballRadius, ballZstart);
 		glm::vec3 BallCurrentPosition = glm::vec3(BallReady.x+ballX, BallReady.y, BallReady.z);
 
-		std::cout<<BallCurrentPosition.x;
+		Ball.minX = BallCurrentPosition.x-ballRadius;
+		Ball.maxX = BallCurrentPosition.x+ballRadius;
+		Ball.minZ = BallCurrentPosition.z-ballRadius;
+		Ball.maxZ = BallCurrentPosition.z+ballRadius;
+
+		TopWall.minX = topXMargin-ballRadius;
+		TopWall.maxX = topXMargin+ballRadius;
+		TopWall.minZ = -2.5f;
+		TopWall.maxZ = 2.5f;
+
+		if(intersect(Ball,TopWall)){
+			Ball.speedX = -Ball.speedX;
+		}
+
 		
 
 		ubo.model = glm::rotate(glm::mat4(1.0f),
