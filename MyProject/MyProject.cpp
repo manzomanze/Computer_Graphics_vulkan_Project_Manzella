@@ -240,6 +240,8 @@ class MyProject : public BaseProject {
 		static MovingObjectDimensions Ball;
 		static ObjectDimensions TopWall;
 		static ObjectDimensions RightWall;
+		static ObjectDimensions LeftWall;
+		
 		static auto previousReleaseValueOfSpace = GLFW_RELEASE;
 
 		///Ball.speedX = 0.0f;
@@ -340,13 +342,21 @@ class MyProject : public BaseProject {
 
 		RightWall.minX = topXMargin;
 		RightWall.maxX = ballXstart;
-		RightWall.minZ = rightZMargin-ballRadius;
-		RightWall.maxZ = rightZMargin+ballRadius;
+		RightWall.minZ = rightZMargin;
+		RightWall.maxZ = rightZMargin;
+
+		LeftWall.minX = topXMargin;
+		LeftWall.maxX = ballXstart;
+		LeftWall.minZ = leftZMargin;
+		LeftWall.maxZ = leftZMargin;
 
 		if(intersect(Ball,TopWall)){
 			Ball.speedX = -Ball.speedX;
 		}
 		if(intersect(Ball,RightWall)){
+			Ball.speedZ = -Ball.speedZ;
+		}
+		if(intersect(Ball,LeftWall)){
 			Ball.speedZ = -Ball.speedZ;
 		}
  	
