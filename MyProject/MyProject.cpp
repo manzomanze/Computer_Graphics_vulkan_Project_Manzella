@@ -239,6 +239,7 @@ class MyProject : public BaseProject {
 
 		static MovingObjectDimensions Ball;
 		static ObjectDimensions TopWall;
+		static ObjectDimensions RightWall;
 		static auto previousReleaseValueOfSpace = GLFW_RELEASE;
 
 		///Ball.speedX = 0.0f;
@@ -307,7 +308,10 @@ class MyProject : public BaseProject {
 			if(glfwGetKey(window,GLFW_KEY_SPACE) == GLFW_RELEASE && previousReleaseValueOfSpace == GLFW_PRESS){
 				launchBallSpeed = pullerDistanceCovered*4.0f;
 				Ball.speedX = launchBallSpeed;
+				// next line must be cancelled, only to test right wall
+				Ball.speedZ = Ball.speedX;
 			}
+
 			previousReleaseValueOfSpace = glfwGetKey(window,GLFW_KEY_SPACE);
 		}
 	
@@ -315,13 +319,14 @@ class MyProject : public BaseProject {
 		
 
 		ballX = ballX-Ball.speedX*deltaT;
+		ballZ = ballZ-Ball.speedZ*0.35f*deltaT;
 
 
 
 		glm::vec3 PullerCurrentPosition = glm::vec3(ballXstart+1.6f+pullerDistanceCovered, ballRadius, ballZstart);
 
 		glm::vec3 BallReady = glm::vec3(ballXstart+ballRadius, ballRadius, ballZstart);
-		glm::vec3 BallCurrentPosition = glm::vec3(BallReady.x+ballX, BallReady.y, BallReady.z);
+		glm::vec3 BallCurrentPosition = glm::vec3(BallReady.x+ballX, BallReady.y, BallReady.z+ballZ);
 
 		Ball.minX = BallCurrentPosition.x-ballRadius;
 		Ball.maxX = BallCurrentPosition.x+ballRadius;
@@ -333,11 +338,18 @@ class MyProject : public BaseProject {
 		TopWall.minZ = -2.5f;
 		TopWall.maxZ = 2.5f;
 
+		RightWall.minX = topXMargin;
+		RightWall.maxX = ballXstart;
+		RightWall.minZ = rightZMargin-ballRadius;
+		RightWall.maxZ = rightZMargin+ballRadius;
+
 		if(intersect(Ball,TopWall)){
 			Ball.speedX = -Ball.speedX;
 		}
-
-		
+		if(intersect(Ball,RightWall)){
+			Ball.speedZ = -Ball.speedZ;
+		}
+ 	
 
 		ubo.model = glm::rotate(glm::mat4(1.0f),
 								glm::radians(-90.0f),
