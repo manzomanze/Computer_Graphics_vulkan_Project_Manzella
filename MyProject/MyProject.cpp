@@ -235,9 +235,9 @@ class MyProject : public BaseProject {
 
 		static float ballXstart = 4.30643f;
 		static float ballZstart = -2.0f;
-		static float ballRadius = 0.15f;
+		
 
-		static MovingObjectDimensions Ball;
+		static MovingRotationalObjectDimensions Ball;
 		static ObjectDimensions TopWall;
 		static ObjectDimensions RightWall;
 		static ObjectDimensions LeftWall;
@@ -330,33 +330,38 @@ class MyProject : public BaseProject {
 		glm::vec3 BallReady = glm::vec3(ballXstart+ballRadius, ballRadius, ballZstart);
 		glm::vec3 BallCurrentPosition = glm::vec3(BallReady.x+ballX, BallReady.y, BallReady.z+ballZ);
 
-		Ball.minX = BallCurrentPosition.x-ballRadius;
+		/* Ball.minX = BallCurrentPosition.x-ballRadius;
 		Ball.maxX = BallCurrentPosition.x+ballRadius;
 		Ball.minZ = BallCurrentPosition.z-ballRadius;
 		Ball.maxZ = BallCurrentPosition.z+ballRadius;
+ */
+		Ball.originX = BallCurrentPosition.x;
+		Ball.originZ = BallCurrentPosition.z;
 
-		TopWall.minX = topXMargin-ballRadius;
-		TopWall.maxX = topXMargin+ballRadius;
+		TopWall.minX = topXMargin-sideWallDepth;
+		TopWall.maxX = topXMargin+sideWallDepth;
 		TopWall.minZ = -2.5f;
 		TopWall.maxZ = 2.5f;
 
 		RightWall.minX = topXMargin;
 		RightWall.maxX = ballXstart;
-		RightWall.minZ = rightZMargin;
-		RightWall.maxZ = rightZMargin;
+		RightWall.minZ = rightZMargin-sideWallDepth;
+		RightWall.maxZ = rightZMargin+sideWallDepth;
 
 		LeftWall.minX = topXMargin;
 		LeftWall.maxX = ballXstart;
-		LeftWall.minZ = leftZMargin;
-		LeftWall.maxZ = leftZMargin;
+		LeftWall.minZ = leftZMargin-sideWallDepth;
+		LeftWall.maxZ = leftZMargin+sideWallDepth;
 
-		if(intersect(Ball,TopWall)){
+		std::cout<< "ball origin:"<<Ball.originX<< " "<< Ball.originZ<<" right wall "<< RightWall.minZ<< " " <<RightWall.maxZ<<std::endl;
+
+		if(intersectBall(Ball,TopWall)){
 			Ball.speedX = -Ball.speedX;
 		}
-		if(intersect(Ball,RightWall)){
+		if(intersectBall(Ball,RightWall)){
 			Ball.speedZ = -Ball.speedZ;
 		}
-		if(intersect(Ball,LeftWall)){
+		if(intersectBall(Ball,LeftWall)){
 			Ball.speedZ = -Ball.speedZ;
 		}
  	

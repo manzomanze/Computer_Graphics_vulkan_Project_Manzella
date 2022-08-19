@@ -34,6 +34,9 @@
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
+const float ballRadius = 0.15f;
+const float sideWallDepth = 0.0015f;
+
 // Lesson 22.0
 const std::vector<const char*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
@@ -112,7 +115,24 @@ struct ObjectDimensions{
 
 
 
+
+
 struct MovingObjectDimensions: ObjectDimensions {
+	float speedX;
+	float speedZ;
+};
+
+struct OrientableObjectDimensions: ObjectDimensions {
+	float orientationWithRespectToNegativeZaxis;
+	float origin;
+};
+
+struct RotationalObjectDimensions{
+	float originX;
+	float originZ;
+};
+
+struct MovingRotationalObjectDimensions : RotationalObjectDimensions{
 	float speedX;
 	float speedZ;
 };
@@ -121,6 +141,23 @@ struct MovingObjectDimensions: ObjectDimensions {
 bool intersect(ObjectDimensions a, ObjectDimensions b) {
   return (a.minX <= b.maxX && a.maxX >= b.minX) &&
          (a.minZ <= b.maxZ && a.maxZ >= b.minZ);
+         
+}
+
+bool intersectBall(MovingRotationalObjectDimensions a, ObjectDimensions b) {
+  float angleResolution = 24;
+  float angleIncrement = 360.0f / angleResolution;
+  
+  for(int i = 0; i<24;i++){
+	if((a.originX - glm::sin(i * angleIncrement)*ballRadius <= b.maxX && a.originX - glm::sin(i * angleIncrement)*ballRadius >= b.minX) &&
+		(a.originZ - glm::cos(i * angleIncrement)*ballRadius <= b.maxZ && a.originZ - glm::cos(i * angleIncrement)*ballRadius >= b.minZ)){
+			return true;
+		}
+  }
+  
+  
+
+  return false;
          
 }
 
