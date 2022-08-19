@@ -230,17 +230,17 @@ class MyProject : public BaseProject {
 
 
 		static float rightZMargin = -2.62219f;
-		static float leftZMargin = 2.41449f;
+		static float leftZMargin = 2.43354f;
 		static float topXMargin = -5.45043f;
 
-		static float ballXstart = 4.30643f;
+		static float ballXstart = 4.0f;
 		static float ballZstart = -2.0f;
 		
 
 		static MovingRotationalObjectDimensions Ball;
-		static ObjectDimensions TopWall;
-		static ObjectDimensions RightWall;
-		static ObjectDimensions LeftWall;
+		static OrientableObjectDimensions TopWall;
+		static OrientableObjectDimensions RightWall;
+		static OrientableObjectDimensions LeftWall;
 		
 		static auto previousReleaseValueOfSpace = GLFW_RELEASE;
 
@@ -308,7 +308,8 @@ class MyProject : public BaseProject {
 				}
 			}
 			if(glfwGetKey(window,GLFW_KEY_SPACE) == GLFW_RELEASE && previousReleaseValueOfSpace == GLFW_PRESS){
-				launchBallSpeed = pullerDistanceCovered*4.0f;
+				//The Minus is because positive x values come toward the viewer and positive Z values go to the left looking straght on at the table
+				launchBallSpeed = -pullerDistanceCovered*4.0f;
 				Ball.speedX = launchBallSpeed;
 				// next line must be cancelled, only to test right wall
 				Ball.speedZ = Ball.speedX;
@@ -320,8 +321,8 @@ class MyProject : public BaseProject {
 
 		
 
-		ballX = ballX-Ball.speedX*deltaT;
-		ballZ = ballZ-Ball.speedZ*0.35f*deltaT;
+		ballX = ballX+Ball.speedX*deltaT;
+		ballZ = ballZ+Ball.speedZ*deltaT;
 
 
 
@@ -339,31 +340,40 @@ class MyProject : public BaseProject {
 		Ball.originZ = BallCurrentPosition.z;
 
 		TopWall.minX = topXMargin-sideWallDepth;
-		TopWall.maxX = topXMargin+sideWallDepth;
+		TopWall.maxX = topXMargin;
 		TopWall.minZ = -2.5f;
 		TopWall.maxZ = 2.5f;
+		TopWall.orientationWithRespectToNegativeZaxis = 3.14/2;
+
 
 		RightWall.minX = topXMargin;
 		RightWall.maxX = ballXstart;
 		RightWall.minZ = rightZMargin-sideWallDepth;
-		RightWall.maxZ = rightZMargin+sideWallDepth;
+		RightWall.maxZ = rightZMargin;
+		RightWall.orientationWithRespectToNegativeZaxis = 0.0f;
 
 		LeftWall.minX = topXMargin;
 		LeftWall.maxX = ballXstart;
-		LeftWall.minZ = leftZMargin-sideWallDepth;
+		LeftWall.minZ = leftZMargin;
 		LeftWall.maxZ = leftZMargin+sideWallDepth;
+		LeftWall.orientationWithRespectToNegativeZaxis = 3.14f;
 
-		std::cout<< "ball origin:"<<Ball.originX<< " "<< Ball.originZ<<" right wall "<< RightWall.minZ<< " " <<RightWall.maxZ<<std::endl;
+		std::cout<< "ball origin X:"<<Ball.originX<< " Z "<< Ball.originZ<<" right wall "<< RightWall.minZ<< " " <<RightWall.maxZ<<std::endl;
+		std::cout<< "ball speed X:"<<Ball.speedX<< " Z "<< Ball.speedZ<<std::endl;
 
 		if(intersectBall(Ball,TopWall)){
 			Ball.speedX = -Ball.speedX;
 		}
-		if(intersectBall(Ball,RightWall)){
+		/* if(intersectBall(Ball,RightWall)){
 			Ball.speedZ = -Ball.speedZ;
-		}
-		if(intersectBall(Ball,LeftWall)){
+		} */
+		/* if(intersectBall(Ball,LeftWall)){
 			Ball.speedZ = -Ball.speedZ;
-		}
+		} */
+
+		Ball = intersectBallOrientedObstacle(Ball,RightWall);
+		Ball = intersectBallOrientedObstacle(Ball,LeftWall);
+		Ball = intersectBallOrientedObstacle(Ball,TopWall);
  	
 
 		ubo.model = glm::rotate(glm::mat4(1.0f),

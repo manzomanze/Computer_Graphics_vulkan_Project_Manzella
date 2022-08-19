@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <fstream>
 #include <array>
+#include <math.h>
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
@@ -35,7 +36,7 @@
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
 const float ballRadius = 0.15f;
-const float sideWallDepth = 0.0015f;
+const float sideWallDepth = 0.30f;
 
 // Lesson 22.0
 const std::vector<const char*> validationLayers = {
@@ -148,17 +149,34 @@ bool intersectBall(MovingRotationalObjectDimensions a, ObjectDimensions b) {
   float angleResolution = 24;
   float angleIncrement = 360.0f / angleResolution;
   
-  for(int i = 0; i<24;i++){
-	if((a.originX - glm::sin(i * angleIncrement)*ballRadius <= b.maxX && a.originX - glm::sin(i * angleIncrement)*ballRadius >= b.minX) &&
-		(a.originZ - glm::cos(i * angleIncrement)*ballRadius <= b.maxZ && a.originZ - glm::cos(i * angleIncrement)*ballRadius >= b.minZ)){
-			return true;
+  	for(int i = 0; i<24;i++){
+		if((a.originX - glm::sin(i * angleIncrement)*ballRadius <= b.maxX && a.originX - glm::sin(i * angleIncrement)*ballRadius >= b.minX) &&
+			(a.originZ - glm::cos(i * angleIncrement)*ballRadius <= b.maxZ && a.originZ - glm::cos(i * angleIncrement)*ballRadius >= b.minZ)){
+				return true;
 		}
-  }
+	}
+	
+	return false;
+}
   
+MovingRotationalObjectDimensions intersectBallOrientedObstacle(MovingRotationalObjectDimensions a, OrientableObjectDimensions b) {
+	float angleResolution = 8;
+	float angleIncrement = 360.0f / angleResolution;
+		
+	// This should give us the angle of the ball movement with respect to  natural axis with Z new to the right and Xnew ging away from the User
+	float ballMovementAngle = atan2(-a.speedX,-a.speedZ);
+	std::cout<<ballMovementAngle<<std::endl;
   
+	for(int i = 0; i<24;i++){
+		if((a.originX - glm::sin(i * angleIncrement)*ballRadius <= b.maxX && a.originX - glm::sin(i * angleIncrement)*ballRadius >= b.minX) &&
+			(a.originZ - glm::cos(i * angleIncrement)*ballRadius <= b.maxZ && a.originZ - glm::cos(i * angleIncrement)*ballRadius >= b.minZ)){
+				a.speedX = glm::sin(2*b.orientationWithRespectToNegativeZaxis-ballMovementAngle);
+				a.speedZ = glm::cos(2*b.orientationWithRespectToNegativeZaxis-ballMovementAngle);
+				return a;
+		}
+	}	
 
-  return false;
-         
+  	return a;     
 }
 
 //// For debugging - Lesson 22.0
