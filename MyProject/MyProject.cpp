@@ -236,6 +236,7 @@ class MyProject : public BaseProject {
 		static float ballXstart = 4.0f;
 		static float ballZstart = -2.0f;
 		
+		//definition of physics interacting objects
 
 		static MovingRotationalObjectDimensions Ball;
 		static OrientableObjectDimensions TopWall;
@@ -320,13 +321,13 @@ class MyProject : public BaseProject {
 	
 
 		
-
+		// Update of ball speed
 		ballX = ballX+Ball.speedX*deltaT;
 		ballZ = ballZ+Ball.speedZ*deltaT;
 
+		// Positions of the objects when they are models
 
-
-		glm::vec3 PullerCurrentPosition = glm::vec3(ballXstart+1.6f+pullerDistanceCovered, ballRadius, ballZstart);
+		glm::vec3 PullerCurrentPosition = glm::vec3(ballXstart+1.9f+pullerDistanceCovered, ballRadius, ballZstart);
 
 		glm::vec3 BallReady = glm::vec3(ballXstart+ballRadius, ballRadius, ballZstart);
 		glm::vec3 BallCurrentPosition = glm::vec3(BallReady.x+ballX, BallReady.y, BallReady.z+ballZ);
@@ -374,7 +375,8 @@ class MyProject : public BaseProject {
 		Ball = intersectBallOrientedObstacle(Ball,RightWall);
 		Ball = intersectBallOrientedObstacle(Ball,LeftWall);
 		Ball = intersectBallOrientedObstacle(Ball,TopWall);
- 	
+
+		// Movement of the models and drawing is described here
 
 		ubo.model = glm::rotate(glm::mat4(1.0f),
 								glm::radians(-90.0f),
