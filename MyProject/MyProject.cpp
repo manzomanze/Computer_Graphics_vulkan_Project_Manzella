@@ -341,8 +341,8 @@ class MyProject : public BaseProject {
 
 		TopWall.minX = topXMargin-sideWallDepth;
 		TopWall.maxX = topXMargin;
-		TopWall.minZ = -2.5f;
-		TopWall.maxZ = 2.5f;
+		TopWall.minZ = rightZMargin;
+		TopWall.maxZ = leftZMargin;
 		TopWall.orientationWithRespectToNegativeZaxis = 3.14/2;
 
 
@@ -356,7 +356,7 @@ class MyProject : public BaseProject {
 		LeftWall.maxX = ballXstart;
 		LeftWall.minZ = leftZMargin;
 		LeftWall.maxZ = leftZMargin+sideWallDepth;
-		LeftWall.orientationWithRespectToNegativeZaxis = 3.14f;
+		LeftWall.orientationWithRespectToNegativeZaxis = 0.0f;
 
 		std::cout<< "ball origin X:"<<Ball.originX<< " Z "<< Ball.originZ<<" right wall "<< RightWall.minZ<< " " <<RightWall.maxZ<<std::endl;
 		std::cout<< "ball speed X:"<<Ball.speedX<< " Z "<< Ball.speedZ<<std::endl;

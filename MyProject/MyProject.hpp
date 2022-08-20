@@ -165,13 +165,21 @@ MovingRotationalObjectDimensions intersectBallOrientedObstacle(MovingRotationalO
 		
 	// This should give us the angle of the ball movement with respect to  natural axis with Z new to the right and Xnew ging away from the User
 	float ballMovementAngle = atan2(-a.speedX,-a.speedZ);
-	std::cout<<ballMovementAngle<<std::endl;
+	/* std::cout<<ballMovementAngle<<std::endl; */
+
+
+	glm::vec2 ballSpeed = glm::vec2(-a.speedZ,-a.speedX);
+	glm::vec2 normal = glm::vec2(-glm::cos(b.orientationWithRespectToNegativeZaxis),-glm::sin(b.orientationWithRespectToNegativeZaxis));
+	glm::vec2 u = (glm::dot(ballSpeed,normal)/glm::dot(normal,normal))*normal;
+	glm::vec2 W = ballSpeed - u;
+	glm::vec2 newBallSpeed = W - u;
+	std::cout<< "speed NEWWW X:"<<newBallSpeed.x<< " Z "<< newBallSpeed.y<<std::endl;
   
-	for(int i = 0; i<24;i++){
+	for(int i = 0; i<angleResolution;i++){
 		if((a.originX - glm::sin(i * angleIncrement)*ballRadius <= b.maxX && a.originX - glm::sin(i * angleIncrement)*ballRadius >= b.minX) &&
 			(a.originZ - glm::cos(i * angleIncrement)*ballRadius <= b.maxZ && a.originZ - glm::cos(i * angleIncrement)*ballRadius >= b.minZ)){
-				a.speedX = glm::sin(2*b.orientationWithRespectToNegativeZaxis-ballMovementAngle);
-				a.speedZ = glm::cos(2*b.orientationWithRespectToNegativeZaxis-ballMovementAngle);
+				a.speedX = -newBallSpeed.y;
+				a.speedZ = -newBallSpeed.x;
 				return a;
 		}
 	}	
