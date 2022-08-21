@@ -163,16 +163,16 @@ bool intersectBall(MovingRotationalObjectDimensions a, ObjectDimensions b) {
 	return false;
 }
   
-MovingRotationalObjectDimensions intersectBallOrientedObstacle(MovingRotationalObjectDimensions a, OrientableObjectDimensions b) {
+MovingRotationalObjectDimensions intersectBallOrientedObstacle(MovingRotationalObjectDimensions ball, OrientableObjectDimensions b) {
 	float angleResolution = 8;
 	float angleIncrement = 360.0f / angleResolution;
 		
 	// This should give us the angle of the ball movement with respect to  natural axis with Z new to the right and Xnew ging away from the User
-	float ballMovementAngle = atan2(-a.speedX,-a.speedZ);
+	float ballMovementAngle = atan2(-ball.speedX,-ball.speedZ);
 	/* std::cout<<ballMovementAngle<<std::endl; */
 
-
-	glm::vec2 ballSpeed = glm::vec2(-a.speedZ,-a.speedX);
+	//collision calculation using vectors
+	glm::vec2 ballSpeed = glm::vec2(-ball.speedZ,-ball.speedX);
 	glm::vec2 normal = glm::vec2(-glm::cos(b.orientationWithRespectToNegativeZaxis),-glm::sin(b.orientationWithRespectToNegativeZaxis));
 	glm::vec2 u = (glm::dot(ballSpeed,normal)/glm::dot(normal,normal))*normal;
 	glm::vec2 W = ballSpeed - u;
@@ -180,16 +180,16 @@ MovingRotationalObjectDimensions intersectBallOrientedObstacle(MovingRotationalO
 	//std::cout<< "speed NEWWW X:"<<newBallSpeed.x<< " Z "<< newBallSpeed.y<<std::endl;
   
 	for(int i = 0; i<angleResolution;i++){
-		if((a.originX - glm::sin(i * angleIncrement)*ballRadius <= b.maxX && a.originX - glm::sin(i * angleIncrement)*ballRadius >= b.minX) &&
-			(a.originZ - glm::cos(i * angleIncrement)*ballRadius <= b.maxZ && a.originZ - glm::cos(i * angleIncrement)*ballRadius >= b.minZ) && 
-			(a.originY  <= b.maxY && a.originY  >= b.minY)){
-				a.speedX = -newBallSpeed.y;
-				a.speedZ = -newBallSpeed.x;
-				return a;
+		if((ball.originX - glm::sin(i * angleIncrement)*ballRadius <= b.maxX && ball.originX - glm::sin(i * angleIncrement)*ballRadius >= b.minX) &&
+			(ball.originZ - glm::cos(i * angleIncrement)*ballRadius <= b.maxZ && ball.originZ - glm::cos(i * angleIncrement)*ballRadius >= b.minZ) && 
+			(ball.originY  <= b.maxY && ball.originY  >= b.minY)){
+				ball.speedX = -newBallSpeed.y;
+				ball.speedZ = -newBallSpeed.x;
+				return ball;
 		}
 	}	
 
-  	return a;     
+  	return ball;     
 }
 
 //// For debugging - Lesson 22.0
