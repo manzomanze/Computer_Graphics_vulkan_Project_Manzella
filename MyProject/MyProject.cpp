@@ -204,6 +204,7 @@ class MyProject : public BaseProject {
 		lastTime = time;
 
 		glm::mat4 BodyPosition = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f, 5.0f, 0.0f));
+		//glm::mat4 BodyPosition = glm::mat4(1.0f);
 
 		static float cameraX = 0.0f;
 		static float cameraY = 0.0f;
@@ -351,24 +352,38 @@ class MyProject : public BaseProject {
 		//std::cout<< "result X:"<<result.x<< " Y "<< result.y<<" Z "<< result.z<<std::endl;
 		BodyPositionVector = glm::vec4(BodyPositionVector.x-1.0f,BodyPositionVector.y-1.0f,BodyPositionVector.z-1.0f,BodyPositionVector.w-1.0f);
 
+		glm::vec4 TopWallminXPositionVector = BodyPosition*glm::vec4(topXMargin-sideWallDepth,0.0f,0.0f,1.0f);
+		glm::vec4 TopWallmaxXPositionVector = BodyPosition*glm::vec4(topXMargin,0.0f,1.0f,1.0f);
+		glm::vec4 TopWallminZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,rightZMargin,1.0f);
+		glm::vec4 TopWallmaxZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,leftZMargin,1.0f);
 
-		TopWall.minX = topXMargin-sideWallDepth+BodyPositionVector.x;
-		TopWall.maxX = topXMargin+BodyPositionVector.x;
-		TopWall.minZ = rightZMargin+BodyPositionVector.z;
-		TopWall.maxZ = leftZMargin+BodyPositionVector.z;
+		TopWall.minX = TopWallminXPositionVector.x;
+		TopWall.maxX = TopWallmaxXPositionVector.x;
+		TopWall.minZ = TopWallminZPositionVector.z;
+		TopWall.maxZ = TopWallmaxZPositionVector.z;
 		TopWall.orientationWithRespectToNegativeZaxis = 3.14/2;
 
+		glm::vec4 RightWallminXPositionVector = BodyPosition*glm::vec4(topXMargin,0.0f,0.0f,1.0f);
+		glm::vec4 RightWallmaxXPositionVector = BodyPosition*glm::vec4(bottomXMargin,0.0f,1.0f,1.0f);
+		glm::vec4 RightWallminZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,rightZMargin-sideWallDepth,1.0f);
+		glm::vec4 RightWallmaxZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,rightZMargin,1.0f);
 
-		RightWall.minX = topXMargin+BodyPositionVector.x;
-		RightWall.maxX = bottomXMargin+BodyPositionVector.x;
-		RightWall.minZ = rightZMargin-sideWallDepth+BodyPositionVector.z;
-		RightWall.maxZ = rightZMargin+BodyPositionVector.z;
+
+		RightWall.minX = RightWallminXPositionVector.x;
+		RightWall.maxX = RightWallmaxXPositionVector.x;
+		RightWall.minZ = RightWallminZPositionVector.z;
+		RightWall.maxZ = RightWallmaxZPositionVector.z;
 		RightWall.orientationWithRespectToNegativeZaxis = 0.0f;
 
-		LeftWall.minX = topXMargin+BodyPositionVector.x;
-		LeftWall.maxX = bottomXMargin+BodyPositionVector.x;
-		LeftWall.minZ = leftZMargin+BodyPositionVector.z;
-		LeftWall.maxZ = leftZMargin+sideWallDepth+BodyPositionVector.z;
+		glm::vec4 LeftWallminXPositionVector = BodyPosition*glm::vec4(topXMargin,0.0f,0.0f,1.0f);
+		glm::vec4 LeftWallmaxXPositionVector = BodyPosition*glm::vec4(bottomXMargin,0.0f,1.0f,1.0f);
+		glm::vec4 LeftWallminZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,leftZMargin,1.0f);
+		glm::vec4 LeftWallmaxZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,leftZMargin+sideWallDepth,1.0f);
+
+		LeftWall.minX = LeftWallminXPositionVector.x;
+		LeftWall.maxX = LeftWallmaxXPositionVector.x;
+		LeftWall.minZ = LeftWallminZPositionVector.z;
+		LeftWall.maxZ = LeftWallmaxZPositionVector.z;
 		LeftWall.orientationWithRespectToNegativeZaxis = 0.0f;
 
 		std::cout<< "ball origin X:"<<Ball.originX<< " Z "<< Ball.originZ<<" right wall "<< RightWall.minZ<< " " <<RightWall.maxZ<<std::endl;
