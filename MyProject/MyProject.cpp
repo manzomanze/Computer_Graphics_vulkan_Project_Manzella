@@ -202,10 +202,11 @@ class MyProject : public BaseProject {
 
 		float deltaT = time - lastTime;
 		lastTime = time;
-
-		glm::mat4 BodyPosition = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f, 5.0f, 0.0f))/* *glm::rotate(glm::mat4(1.0f),
+		
+		glm::mat4 BodyPositionRotation = glm::mat4(1.0f)/* glm::rotate(glm::mat4(1.0f),
 								glm::radians(45.0f),
 								glm::vec3(1.0f, 0.0f, 0.0f)) */;
+		glm::mat4 BodyPosition = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f, 5.0f, 0.0f))*BodyPositionRotation;
 		//glm::mat4 BodyPosition = glm::mat4(1.0f);
 
 		static float cameraX = 0.0f;
@@ -244,6 +245,8 @@ class MyProject : public BaseProject {
 		static float rightFlipperMargin = 1.37733f;
 		static float leftFlipperMargin = -1.09777f;
 
+		
+
 		static float ballXstart = 4.0f;
 		static float ballZstart = -2.0f;
 		
@@ -256,6 +259,7 @@ class MyProject : public BaseProject {
 		
 		static auto previousReleaseValueOfSpace = GLFW_RELEASE;
 
+		
 		///Ball.speedX = 0.0f;
 		/* 
 			Camera Linear Movement
@@ -325,6 +329,8 @@ class MyProject : public BaseProject {
 				Ball.speedX = launchBallSpeed;
 				// next line must be cancelled, only to test right wall
 				Ball.speedZ = Ball.speedX;
+				Ball.speedY = 0.0f;
+
 			}
 
 			previousReleaseValueOfSpace = glfwGetKey(window,GLFW_KEY_SPACE);
@@ -332,17 +338,20 @@ class MyProject : public BaseProject {
 	
 
 		
+		Ball.speedY = 0.0f;
+		glm::vec4 BallSpeedWRTBody = BodyPositionRotation*glm::vec4(Ball.speedX,Ball.speedY,Ball.speedZ,1.0f);
+
 		// Update of ball speed in the coordinates of the body
-		ballX = ballX+Ball.speedX*deltaT;
-		ballY = ballY+Ball.speedY*deltaT;
-		ballZ = ballZ+Ball.speedZ*deltaT;
+		ballX = ballX+BallSpeedWRTBody.x*deltaT;
+		ballY = ballY+BallSpeedWRTBody.y*deltaT;
+		ballZ = ballZ+BallSpeedWRTBody.z*deltaT;
 
 		// Positions of the objects when they are models
 
 		glm::mat4 PullerCurrentPosition = glm::translate(glm::mat4(1.0f),glm::vec3(ballXstart+1.9f+pullerDistanceCovered, ballRadius, ballZstart))*BodyPosition;
 
 		glm::vec3 BallReady = glm::vec3(ballXstart+ballRadius, ballRadius, ballZstart);
-		glm::mat4 BallCurrentPosition = glm::translate(glm::mat4(1.0f),glm::vec3(BallReady.x+ballX, BallReady.y, BallReady.z+ballZ))*BodyPosition;
+		glm::mat4 BallCurrentPosition = glm::translate(glm::mat4(1.0f),glm::vec3(BallReady.x+ballX, BallReady.y+ballY, BallReady.z+ballZ))*BodyPosition;
 		glm::vec4 BallCurrentPositionvector = BallCurrentPosition*glm::vec4(1.0f,1.0f,1.0f,1.0f);
 		BallCurrentPositionvector = glm::vec4(BallCurrentPositionvector.x-1.0f,BallCurrentPositionvector.y-1.0f,BallCurrentPositionvector.z-1.0f,BallCurrentPositionvector.w-1.0f);
 
@@ -400,7 +409,8 @@ class MyProject : public BaseProject {
 
 		std::cout<< "ball origin X:"<<Ball.originX<< " Y "<< Ball.originY<<" Z "<< Ball.originZ<<std::endl;
 		std::cout<< "right wall Y: min"<<RightWall.minY<< " max "<< RightWall.maxY<<" Z "<< Ball.originZ<<std::endl;
-		std::cout<< "ball speed X:"<<Ball.speedX<< " Z "<< Ball.speedZ<<std::endl;
+		std::cout<< "ball speed X:"<<Ball.speedX<< " Y "<< Ball.speedY<<" Z "<< Ball.speedZ<<std::endl;
+		std::cout<< "ball speed in Global reference X:"<<BallSpeedWRTBody.x<< " Y "<< BallSpeedWRTBody.y<<" Z "<< BallSpeedWRTBody.z<<std::endl;
 
 
 		Ball = intersectBallOrientedObstacle(Ball,RightWall);
