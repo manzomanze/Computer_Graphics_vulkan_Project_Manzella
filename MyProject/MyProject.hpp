@@ -173,7 +173,7 @@ MovingRotationalObjectDimensions intersectBallOrientedObstacle(MovingRotationalO
 	glm::vec2 u = (glm::dot(ballSpeed,normal)/glm::dot(normal,normal))*normal;
 	glm::vec2 W = ballSpeed - u;
 	glm::vec2 newBallSpeed = W - u;
-	std::cout<< "speed NEWWW X:"<<newBallSpeed.x<< " Z "<< newBallSpeed.y<<std::endl;
+	//std::cout<< "speed NEWWW X:"<<newBallSpeed.x<< " Z "<< newBallSpeed.y<<std::endl;
   
 	for(int i = 0; i<angleResolution;i++){
 		if((a.originX - glm::sin(i * angleIncrement)*ballRadius <= b.maxX && a.originX - glm::sin(i * angleIncrement)*ballRadius >= b.minX) &&
