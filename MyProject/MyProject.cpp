@@ -203,7 +203,9 @@ class MyProject : public BaseProject {
 		float deltaT = time - lastTime;
 		lastTime = time;
 
-		glm::mat4 BodyPosition = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f, 5.0f, 0.0f));
+		glm::mat4 BodyPosition = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f, 5.0f, 0.0f))/* *glm::rotate(glm::mat4(1.0f),
+								glm::radians(45.0f),
+								glm::vec3(1.0f, 0.0f, 0.0f)) */;
 		//glm::mat4 BodyPosition = glm::mat4(1.0f);
 
 		static float cameraX = 0.0f;
@@ -229,6 +231,7 @@ class MyProject : public BaseProject {
 		
 		
 		static float ballX = 0.0f;
+		static float ballY = 0.0f;
 		static float ballZ = 0.0f;
 
 
@@ -236,6 +239,8 @@ class MyProject : public BaseProject {
 		static float leftZMargin = 2.54627f;
 		static float topXMargin = -5.45043f;
 		static float bottomXMargin = 4.26388f;
+		static float topYMargin = 2.0f;
+		static float bottomYMargin = 0.0f;
 		static float rightFlipperMargin = 1.37733f;
 		static float leftFlipperMargin = -1.09777f;
 
@@ -327,8 +332,9 @@ class MyProject : public BaseProject {
 	
 
 		
-		// Update of ball speed
+		// Update of ball speed in the coordinates of the body
 		ballX = ballX+Ball.speedX*deltaT;
+		ballY = ballY+Ball.speedY*deltaT;
 		ballZ = ballZ+Ball.speedZ*deltaT;
 
 		// Positions of the objects when they are models
@@ -340,17 +346,17 @@ class MyProject : public BaseProject {
 		glm::vec4 BallCurrentPositionvector = BallCurrentPosition*glm::vec4(1.0f,1.0f,1.0f,1.0f);
 		BallCurrentPositionvector = glm::vec4(BallCurrentPositionvector.x-1.0f,BallCurrentPositionvector.y-1.0f,BallCurrentPositionvector.z-1.0f,BallCurrentPositionvector.w-1.0f);
 
-		/* Ball.minX = BallCurrentPosition.x-ballRadius;
-		Ball.maxX = BallCurrentPosition.x+ballRadius;
-		Ball.minZ = BallCurrentPosition.z-ballRadius;
-		Ball.maxZ = BallCurrentPosition.z+ballRadius;
- */
+
 		Ball.originX = BallCurrentPositionvector.x;
+		Ball.originY = BallCurrentPositionvector.y;
 		Ball.originZ = BallCurrentPositionvector.z;
 
 		glm::vec4 BodyPositionVector = BodyPosition*glm::vec4(1.0f,1.0f,1.0f,1.0f);
 		//std::cout<< "result X:"<<result.x<< " Y "<< result.y<<" Z "<< result.z<<std::endl;
 		BodyPositionVector = glm::vec4(BodyPositionVector.x-1.0f,BodyPositionVector.y-1.0f,BodyPositionVector.z-1.0f,BodyPositionVector.w-1.0f);
+
+		glm::vec4 AnyWallminYPositionVector = BodyPosition*glm::vec4(0.0f,bottomYMargin,0.0f,1.0f);
+		glm::vec4 AnyWallmaxYPositionVector = BodyPosition*glm::vec4(0.0f,topYMargin,0.0f,1.0f);
 
 		glm::vec4 TopWallminXPositionVector = BodyPosition*glm::vec4(topXMargin-sideWallDepth,0.0f,0.0f,1.0f);
 		glm::vec4 TopWallmaxXPositionVector = BodyPosition*glm::vec4(topXMargin,0.0f,1.0f,1.0f);
@@ -359,6 +365,8 @@ class MyProject : public BaseProject {
 
 		TopWall.minX = TopWallminXPositionVector.x;
 		TopWall.maxX = TopWallmaxXPositionVector.x;
+		TopWall.minY = AnyWallminYPositionVector.y;
+		TopWall.maxY = AnyWallmaxYPositionVector.y;
 		TopWall.minZ = TopWallminZPositionVector.z;
 		TopWall.maxZ = TopWallmaxZPositionVector.z;
 		TopWall.orientationWithRespectToNegativeZaxis = 3.14/2;
@@ -371,6 +379,8 @@ class MyProject : public BaseProject {
 
 		RightWall.minX = RightWallminXPositionVector.x;
 		RightWall.maxX = RightWallmaxXPositionVector.x;
+		RightWall.minY = AnyWallminYPositionVector.y;
+		RightWall.maxY = AnyWallmaxYPositionVector.y;
 		RightWall.minZ = RightWallminZPositionVector.z;
 		RightWall.maxZ = RightWallmaxZPositionVector.z;
 		RightWall.orientationWithRespectToNegativeZaxis = 0.0f;
@@ -382,22 +392,16 @@ class MyProject : public BaseProject {
 
 		LeftWall.minX = LeftWallminXPositionVector.x;
 		LeftWall.maxX = LeftWallmaxXPositionVector.x;
+		LeftWall.minY = AnyWallminYPositionVector.y;
+		LeftWall.maxY = AnyWallmaxYPositionVector.y;
 		LeftWall.minZ = LeftWallminZPositionVector.z;
 		LeftWall.maxZ = LeftWallmaxZPositionVector.z;
 		LeftWall.orientationWithRespectToNegativeZaxis = 0.0f;
 
-		std::cout<< "ball origin X:"<<Ball.originX<< " Z "<< Ball.originZ<<" right wall "<< RightWall.minZ<< " " <<RightWall.maxZ<<std::endl;
+		std::cout<< "ball origin X:"<<Ball.originX<< " Y "<< Ball.originY<<" Z "<< Ball.originZ<<std::endl;
+		std::cout<< "right wall Y: min"<<RightWall.minY<< " max "<< RightWall.maxY<<" Z "<< Ball.originZ<<std::endl;
 		std::cout<< "ball speed X:"<<Ball.speedX<< " Z "<< Ball.speedZ<<std::endl;
 
-		/* if(intersectBall(Ball,TopWall)){
-			Ball.speedX = -Ball.speedX;
-		} */
-		/* if(intersectBall(Ball,RightWall)){
-			Ball.speedZ = -Ball.speedZ;
-		} */
-		/* if(intersectBall(Ball,LeftWall)){
-			Ball.speedZ = -Ball.speedZ;
-		} */
 
 		Ball = intersectBallOrientedObstacle(Ball,RightWall);
 		Ball = intersectBallOrientedObstacle(Ball,LeftWall);

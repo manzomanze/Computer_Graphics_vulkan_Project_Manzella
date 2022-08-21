@@ -110,6 +110,8 @@ struct SwapChainSupportDetails {
 struct ObjectDimensions{
 	float minX;
 	float maxX;
+	float minY;
+	float maxY;
 	float minZ;
 	float maxZ;
 };
@@ -130,11 +132,13 @@ struct OrientableObjectDimensions: ObjectDimensions {
 
 struct RotationalObjectDimensions{
 	float originX;
+	float originY;
 	float originZ;
 };
 
 struct MovingRotationalObjectDimensions : RotationalObjectDimensions{
 	float speedX;
+	float speedY;
 	float speedZ;
 };
 
@@ -177,7 +181,8 @@ MovingRotationalObjectDimensions intersectBallOrientedObstacle(MovingRotationalO
   
 	for(int i = 0; i<angleResolution;i++){
 		if((a.originX - glm::sin(i * angleIncrement)*ballRadius <= b.maxX && a.originX - glm::sin(i * angleIncrement)*ballRadius >= b.minX) &&
-			(a.originZ - glm::cos(i * angleIncrement)*ballRadius <= b.maxZ && a.originZ - glm::cos(i * angleIncrement)*ballRadius >= b.minZ)){
+			(a.originZ - glm::cos(i * angleIncrement)*ballRadius <= b.maxZ && a.originZ - glm::cos(i * angleIncrement)*ballRadius >= b.minZ) && 
+			(a.originY  <= b.maxY && a.originY  >= b.minY)){
 				a.speedX = -newBallSpeed.y;
 				a.speedZ = -newBallSpeed.x;
 				return a;
