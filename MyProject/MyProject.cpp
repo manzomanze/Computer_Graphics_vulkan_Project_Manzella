@@ -247,7 +247,7 @@ class MyProject : public BaseProject {
 
 		
 
-		static float ballXstart = 4.0f;
+		static float ballXstart = 3.5f;
 		static float ballZstart = -2.0f;
 		
 		//definition of physics interacting objects
@@ -256,6 +256,8 @@ class MyProject : public BaseProject {
 		static OrientableObjectDimensions TopWall;
 		static OrientableObjectDimensions RightWall;
 		static OrientableObjectDimensions LeftWall;
+		static OrientableObjectDimensions BottomRightWall;
+		static OrientableObjectDimensions BottomLeftWall;
 		
 		static auto previousReleaseValueOfSpace = GLFW_RELEASE;
 
@@ -410,6 +412,32 @@ class MyProject : public BaseProject {
 		LeftWall.maxZ = LeftWallmaxZPositionVector.z;
 		LeftWall.orientationWithRespectToNegativeZaxis = 0.0f;
 
+		glm::vec4 BottomRightWallminXPositionVector = BodyPosition*glm::vec4(bottomXMargin,0.0f,0.0f,1.0f);
+		glm::vec4 BottomRightWallmaxXPositionVector = BodyPosition*glm::vec4(bottomXMargin+sideWallDepth,0.0f,1.0f,1.0f);
+		glm::vec4 BottomRightWallminZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,rightZMargin,1.0f);
+		glm::vec4 BottomRightWallmaxZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,rightFlipperMargin,1.0f);
+
+		BottomRightWall.minX = BottomRightWallminXPositionVector.x;
+		BottomRightWall.maxX = BottomRightWallmaxXPositionVector.x;
+		BottomRightWall.minY = AnyWallminYPositionVector.y;
+		BottomRightWall.maxY = AnyWallmaxYPositionVector.y;
+		BottomRightWall.minZ = BottomRightWallminZPositionVector.z;
+		BottomRightWall.maxZ = BottomRightWallmaxZPositionVector.z;
+		BottomRightWall.orientationWithRespectToNegativeZaxis = -3.14/2;
+
+		glm::vec4 BottomLeftWallminXPositionVector = BodyPosition*glm::vec4(bottomXMargin,0.0f,0.0f,1.0f);
+		glm::vec4 BottomLeftWallmaxXPositionVector = BodyPosition*glm::vec4(bottomXMargin+sideWallDepth,0.0f,1.0f,1.0f);
+		glm::vec4 BottomLeftWallminZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,leftFlipperMargin,1.0f);
+		glm::vec4 BottomLeftWallmaxZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,leftZMargin,1.0f);
+
+		BottomLeftWall.minX = BottomLeftWallminXPositionVector.x;
+		BottomLeftWall.maxX = BottomLeftWallmaxXPositionVector.x;
+		BottomLeftWall.minY = AnyWallminYPositionVector.y;
+		BottomLeftWall.maxY = AnyWallmaxYPositionVector.y;
+		BottomLeftWall.minZ = BottomLeftWallminZPositionVector.z;
+		BottomLeftWall.maxZ = BottomLeftWallmaxZPositionVector.z;
+		BottomLeftWall.orientationWithRespectToNegativeZaxis = -3.14/2;
+
 		std::cout<< "ball origin X:"<<Ball.originX<< " Y "<< Ball.originY<<" Z "<< Ball.originZ<<std::endl;
 		std::cout<< "right wall Y: min"<<RightWall.minY<< " max "<< RightWall.maxY<<" Z "<< Ball.originZ<<std::endl;
 		std::cout<< "ball speed X:"<<Ball.speedX<< " Y "<< Ball.speedY<<" Z "<< Ball.speedZ<<std::endl;
@@ -419,6 +447,8 @@ class MyProject : public BaseProject {
 		Ball = intersectBallOrientedObstacle(Ball,RightWall);
 		Ball = intersectBallOrientedObstacle(Ball,LeftWall);
 		Ball = intersectBallOrientedObstacle(Ball,TopWall);
+		Ball = intersectBallOrientedObstacle(Ball,BottomRightWall);
+		Ball = intersectBallOrientedObstacle(Ball,BottomLeftWall);
 
 		// Movement of the models and drawing is described here
 
