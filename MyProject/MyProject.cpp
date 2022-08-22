@@ -36,6 +36,14 @@ class MyProject : public BaseProject {
 	Model Ball;
 	Texture BallTexture;
 	DescriptorSet DSBall;
+
+	Model LeftFlipper;
+	Texture LeftFlipperTexture;
+	DescriptorSet DSLeftFlipper;
+
+	Model RightFlipper;
+	Texture RightFlipperTexture;
+	DescriptorSet DSRightFlipper;
 	
 	// Here you set the main application parameters
 	void setWindowParameters() {
@@ -46,9 +54,9 @@ class MyProject : public BaseProject {
 		initialBackgroundColor = {1.0f, 1.0f, 1.0f, 1.0f};
 		
 		// Descriptor pool sizes
-		uniformBlocksInPool = 3;
-		texturesInPool = 3;
-		setsInPool = 3;
+		uniformBlocksInPool = 5;
+		texturesInPool = 5;
+		setsInPool = 5;
 	}
 	
 	// Here you load and setup all your Vulkan objects
@@ -103,6 +111,24 @@ class MyProject : public BaseProject {
 					{1, TEXTURE, 0, &BallTexture}
 				});
 
+		LeftFlipper.init(this, "models/PinballDark/LeftFlipper.obj");
+		LeftFlipperTexture.init(this, "textures/StarWarsPinball.png");
+
+
+		DSLeftFlipper.init(this, &DSL1, {
+					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+					{1, TEXTURE, 0, &LeftFlipperTexture}
+				});
+
+		RightFlipper.init(this, "models/PinballDark/RightFlipper.obj");
+		RightFlipperTexture.init(this, "textures/StarWarsPinball.png");
+
+
+		DSRightFlipper.init(this, &DSL1, {
+					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+					{1, TEXTURE, 0, &RightFlipperTexture}
+				});
+
 		
 	}
 
@@ -120,6 +146,15 @@ class MyProject : public BaseProject {
 		DSBall.cleanup();
 		BallTexture.cleanup();
 		Ball.cleanup();
+
+		DSLeftFlipper.cleanup();
+		LeftFlipperTexture.cleanup();
+		LeftFlipper.cleanup();
+
+		DSRightFlipper.cleanup();
+		RightFlipperTexture.cleanup();
+		RightFlipper.cleanup();
+
 
 		DSL1.cleanup();
 		P1.cleanup();
@@ -183,6 +218,36 @@ class MyProject : public BaseProject {
 		vkCmdDrawIndexed(commandBuffer,
 					static_cast<uint32_t>(Ball.indices.size()), 1, 0, 0, 0);
 
+		// LeftFlipper
+		VkBuffer vertexBuffersLeftFlipper[] = {LeftFlipper.vertexBuffer};
+		VkDeviceSize offsetsLeftFlipper[] = {0};
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffersLeftFlipper, offsetsLeftFlipper);
+		vkCmdBindIndexBuffer(commandBuffer, LeftFlipper.indexBuffer, 0,
+								VK_INDEX_TYPE_UINT32);
+
+		vkCmdBindDescriptorSets(commandBuffer,
+						VK_PIPELINE_BIND_POINT_GRAPHICS,
+						P1.pipelineLayout, 0, 1, &DSLeftFlipper.descriptorSets[currentImage],
+						0, nullptr);
+						
+		vkCmdDrawIndexed(commandBuffer,
+					static_cast<uint32_t>(LeftFlipper.indices.size()), 1, 0, 0, 0);
+
+		// RightFlipper
+		VkBuffer vertexBuffersRightFlipper[] = {RightFlipper.vertexBuffer};
+		VkDeviceSize offsetsRightFlipper[] = {0};
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffersRightFlipper, offsetsRightFlipper);
+		vkCmdBindIndexBuffer(commandBuffer, RightFlipper.indexBuffer, 0,
+								VK_INDEX_TYPE_UINT32);
+
+		vkCmdBindDescriptorSets(commandBuffer,
+						VK_PIPELINE_BIND_POINT_GRAPHICS,
+						P1.pipelineLayout, 0, 1, &DSRightFlipper.descriptorSets[currentImage],
+						0, nullptr);
+						
+		vkCmdDrawIndexed(commandBuffer,
+					static_cast<uint32_t>(RightFlipper.indices.size()), 1, 0, 0, 0);
+
 
 					
 	}
@@ -206,8 +271,8 @@ class MyProject : public BaseProject {
 		glm::mat4 BodyPositionRotation = glm::mat4(1.0f)/* glm::rotate(glm::mat4(1.0f),
 								glm::radians(45.0f),
 								glm::vec3(1.0f, 0.0f, 0.0f)) */;
-		glm::mat4 BodyPosition = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f, 5.0f, 0.0f))*BodyPositionRotation;
-		//glm::mat4 BodyPosition = glm::mat4(1.0f);
+		//glm::mat4 BodyPosition = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f, 5.0f, 0.0f))*BodyPositionRotation;
+		glm::mat4 BodyPosition = glm::mat4(1.0f);
 
 		static float cameraX = 0.0f;
 		static float cameraY = 0.0f;
@@ -242,8 +307,8 @@ class MyProject : public BaseProject {
 		static float bottomXMargin = 4.26388f;
 		static float topYMargin = 2.0f;
 		static float bottomYMargin = 0.0f;
-		static float rightFlipperMargin = 1.37733f;
-		static float leftFlipperMargin = -1.09777f;
+		static float leftFlipperMargin = 1.0f;
+		static float rightFlipperMargin = -1.2f;
 
 		
 
@@ -258,6 +323,15 @@ class MyProject : public BaseProject {
 		static OrientableObjectDimensions LeftWall;
 		static OrientableObjectDimensions BottomRightWall;
 		static OrientableObjectDimensions BottomLeftWall;
+
+
+		static float leftFlipperRotate = 0.0f;
+		static float rightFlipperRotate = 0.0f;
+		static float flipperRotateSpeed = 200.0f;
+
+
+		static OrientableObjectDimensions LeftFlipper;
+		static OrientableObjectDimensions RightFlipper;
 		
 		static auto previousReleaseValueOfSpace = GLFW_RELEASE;
 
@@ -340,6 +414,42 @@ class MyProject : public BaseProject {
 
 			previousReleaseValueOfSpace = glfwGetKey(window,GLFW_KEY_SPACE);
 		}
+
+		/* left flipper rotate */
+		{
+			if(glfwGetKey(window,GLFW_KEY_G)){
+				
+				if(leftFlipperRotate<=60.0f){
+					leftFlipperRotate = leftFlipperRotate+flipperRotateSpeed*deltaT;
+					
+				}
+			}else{
+				if(leftFlipperRotate>=0.0f){
+					leftFlipperRotate = leftFlipperRotate-flipperRotateSpeed*deltaT;
+					
+				}
+			}
+
+		}
+		
+
+		/* right flipper rotate */
+		{
+			if(glfwGetKey(window,GLFW_KEY_H)){
+				
+				if(rightFlipperRotate>=-60.0f){
+					rightFlipperRotate = rightFlipperRotate-flipperRotateSpeed*deltaT;
+					
+				}
+			}else{
+				if(rightFlipperRotate<=0.0f){
+					rightFlipperRotate = rightFlipperRotate+flipperRotateSpeed*deltaT;
+					
+				}
+			}
+
+		}
+		
 	
 
 		
@@ -368,6 +478,27 @@ class MyProject : public BaseProject {
 		glm::vec4 BodyPositionVector = BodyPosition*glm::vec4(1.0f,1.0f,1.0f,1.0f);
 		//std::cout<< "result X:"<<result.x<< " Y "<< result.y<<" Z "<< result.z<<std::endl;
 		BodyPositionVector = glm::vec4(BodyPositionVector.x-1.0f,BodyPositionVector.y-1.0f,BodyPositionVector.z-1.0f,BodyPositionVector.w-1.0f);
+
+
+		glm::mat4 RightFlipperCurrentPosition = glm::translate(glm::mat4(1.0f),glm::vec3(bottomXMargin-0.7f, ballRadius, rightFlipperMargin))*
+												glm::rotate(glm::mat4(1.0f),
+												glm::radians(120.0f),
+												glm::vec3(0.0f, 1.0f, 0.0f))*
+												glm::rotate(glm::mat4(1.0f),
+												glm::radians(rightFlipperRotate),
+												glm::vec3(0.0f, 1.0f, 0.0f))*
+												BodyPosition;
+
+		glm::mat4 LeftFlipperCurrentPosition = 	glm::translate(glm::mat4(1.0f),glm::vec3(bottomXMargin-0.7f, ballRadius, leftFlipperMargin))*
+												glm::rotate(glm::mat4(1.0f),
+												glm::radians(-120.0f),
+												glm::vec3(0.0f, 1.0f, 0.0f))*
+												glm::rotate(glm::mat4(1.0f),
+												glm::radians(leftFlipperRotate),
+												glm::vec3(0.0f, 1.0f, 0.0f))*
+												BodyPosition;
+
+
 
 		glm::vec4 AnyWallminYPositionVector = BodyPosition*glm::vec4(0.0f,bottomYMargin,0.0f,1.0f);
 		glm::vec4 AnyWallmaxYPositionVector = BodyPosition*glm::vec4(0.0f,topYMargin,0.0f,1.0f);
@@ -497,6 +628,22 @@ class MyProject : public BaseProject {
 							sizeof(ubo), 0, &data);
 		memcpy(data, &ubo, sizeof(ubo));
 		vkUnmapMemory(device, DSBall.uniformBuffersMemory[0][currentImage]);
+
+		//Ball Position
+		ubo.model = LeftFlipperCurrentPosition;
+					
+		vkMapMemory(device, DSLeftFlipper.uniformBuffersMemory[0][currentImage], 0,
+							sizeof(ubo), 0, &data);
+		memcpy(data, &ubo, sizeof(ubo));
+		vkUnmapMemory(device, DSLeftFlipper.uniformBuffersMemory[0][currentImage]);
+
+		//Ball Position
+		ubo.model = RightFlipperCurrentPosition;
+					
+		vkMapMemory(device, DSRightFlipper.uniformBuffersMemory[0][currentImage], 0,
+							sizeof(ubo), 0, &data);
+		memcpy(data, &ubo, sizeof(ubo));
+		vkUnmapMemory(device, DSRightFlipper.uniformBuffersMemory[0][currentImage]);
 	}	
 };
 
