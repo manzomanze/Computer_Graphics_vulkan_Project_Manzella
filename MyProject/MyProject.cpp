@@ -313,6 +313,9 @@ class MyProject : public BaseProject {
 		*/
 		{
 			if(glfwGetKey(window,GLFW_KEY_SPACE)){
+				ballX = 0.0f; 
+				ballY = 0.0f;
+				ballZ = 0.0f;
 				if(pullerDistanceCovered<=0.8f){
 					pullerDistanceCovered = pullerDistanceCovered+pullSpeed*deltaT;
 					
