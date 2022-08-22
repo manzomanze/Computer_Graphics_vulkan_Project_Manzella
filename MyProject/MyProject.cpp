@@ -328,6 +328,8 @@ class MyProject : public BaseProject {
 		static float leftFlipperRotate = 0.0f;
 		static float rightFlipperRotate = 0.0f;
 		static float flipperRotateSpeed = 200.0f;
+		static float gravityconstant = 1.0f;
+		static float activeGravity = 0.0f;
 
 
 		static OrientableObjectDimensions LeftFlipper;
@@ -392,6 +394,7 @@ class MyProject : public BaseProject {
 				ballX = 0.0f; 
 				ballY = 0.0f;
 				ballZ = 0.0f;
+				activeGravity = 0.0f;
 				if(pullerDistanceCovered<=0.8f){
 					pullerDistanceCovered = pullerDistanceCovered+pullSpeed*deltaT;
 					
@@ -409,6 +412,7 @@ class MyProject : public BaseProject {
 				// next line must be cancelled, only to test right wall
 				Ball.speedZ = Ball.speedX;
 				Ball.speedY = 0.0f;
+				activeGravity = 1.0f;
 
 			}
 
@@ -454,6 +458,7 @@ class MyProject : public BaseProject {
 
 		
 		Ball.speedY = 0.0f;
+		Ball.speedX = Ball.speedX+activeGravity*gravityconstant*deltaT;
 		glm::vec4 BallSpeedWRTBody = BodyPositionRotation*glm::vec4(Ball.speedX,Ball.speedY,Ball.speedZ,1.0f);
 
 		// Update of ball speed in the coordinates of the body
