@@ -21,6 +21,7 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/intersect.hpp>
 
 #include <chrono>
 
@@ -108,12 +109,26 @@ struct SwapChainSupportDetails {
 
 
 struct ObjectDimensions{
+	std::string name;
 	float minX;
 	float maxX;
 	float minY;
 	float maxY;
 	float minZ;
 	float maxZ;
+};
+
+struct ObjectPointByPoint{
+	std::string name;
+	float bottomLeftX;
+	float bottomLeftZ;
+	float bottomRightX;
+	float bottomRightZ;
+	float topLeftX;
+	float topLeftZ;
+	float topRightX;
+	float topRightZ;
+	float orientationWithRespectToNegativeZaxis;
 };
 
 
@@ -191,6 +206,70 @@ MovingRotationalObjectDimensions intersectBallOrientedObstacle(MovingRotationalO
 
   	return ball;     
 }
+
+
+bool pointIsleftToTheVector(float testPointX, float testPointY, float prismPoint1X, float prismPoint1Y, float prismPoint2X,float prismPoint2Y)
+{
+	return ((prismPoint2X - prismPoint1X)*(testPointY - prismPoint1Y) - (prismPoint2Y - prismPoint1Y)*(testPointX - prismPoint1X)) > 0;
+		float A = -(prismPoint2Y-prismPoint1Y);
+		float B = (prismPoint2X-prismPoint1X);
+		float C = -A*prismPoint1X+B*prismPoint1Y;
+		std::cout<<A*testPointX+B*testPointY+C<<" ";
+		if(A*testPointX+B*testPointY+C>0.0f) return true;
+		return false;
+}
+
+bool pointIsInside(float testPointX, float testPointZ, ObjectPointByPoint prism){
+	
+
+	bool firstEdge = pointIsleftToTheVector(testPointX,testPointZ,prism.bottomRightX,prism.bottomRightZ,prism.bottomLeftX,prism.bottomLeftZ);
+	bool secondEdge = pointIsleftToTheVector(testPointX,testPointZ,prism.topRightX,prism.topRightZ,prism.bottomRightX,prism.bottomRightZ);
+	bool thirdEdge = pointIsleftToTheVector(testPointX,testPointZ,prism.topLeftX,prism.topLeftZ,prism.topRightX,prism.topRightZ);
+	bool fourthEdge = pointIsleftToTheVector(testPointX,testPointZ,prism.bottomLeftX,prism.bottomLeftZ,prism.topLeftX,prism.topLeftZ);
+	std::cout<<std::endl;
+
+	std::cout<<firstEdge<<secondEdge<<thirdEdge<<fourthEdge<<std::endl;
+	if(firstEdge && secondEdge && thirdEdge && fourthEdge){return true;}
+	return false;
+}
+
+MovingRotationalObjectDimensions intersectBallObjectPointByPoint(MovingRotationalObjectDimensions ball, ObjectPointByPoint b) {
+	float angleResolution = 8;
+	float angleIncrement = 360.0f / angleResolution;
+		
+	// This should give us the angle of the ball movement with respect to  natural axis with Z new to the right and Xnew ging away from the User
+	float ballMovementAngle = atan2(-ball.speedX,-ball.speedZ);
+	/* std::cout<<ballMovementAngle<<std::endl; */
+
+	
+
+	//collision calculation using vectors
+	glm::vec2 ballSpeed = glm::vec2(-ball.speedZ,-ball.speedX);
+	glm::vec2 normal = glm::vec2(-glm::cos(b.orientationWithRespectToNegativeZaxis),-glm::sin(b.orientationWithRespectToNegativeZaxis));
+	glm::vec2 u = (glm::dot(ballSpeed,normal)/glm::dot(normal,normal))*normal;
+	glm::vec2 W = ballSpeed - u;
+	glm::vec2 newBallSpeed = W - u;
+	//std::cout<< "speed NEWWW X:"<<newBallSpeed.x<< " Z "<< newBallSpeed.y<<std::endl;
+  
+	
+
+
+	for(int i = 0; i<angleResolution;i++){
+		float testPointX = ball.originX - glm::sin(i * angleIncrement)*ballRadius;
+		float testPointZ = ball.originZ - glm::cos(i * angleIncrement)*ballRadius;
+
+		if(pointIsInside(testPointX,testPointZ,b)){
+			ball.speedX = -newBallSpeed.y;
+			ball.speedZ = -newBallSpeed.x;
+			return ball; 
+		}
+	
+	}  
+
+  	return ball; 
+	  
+}
+
 
 //// For debugging - Lesson 22.0
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,

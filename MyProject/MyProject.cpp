@@ -323,6 +323,9 @@ class MyProject : public BaseProject {
 		static OrientableObjectDimensions LeftWall;
 		static OrientableObjectDimensions BottomRightWall;
 		static OrientableObjectDimensions BottomLeftWall;
+		static ObjectPointByPoint LeftFlipperPoints;
+		LeftFlipperPoints.name = "left flipper";
+		RightWall.name = "right wall";
 
 
 		static float leftFlipperRotate = 0.0f;
@@ -407,7 +410,7 @@ class MyProject : public BaseProject {
 			}
 			if(glfwGetKey(window,GLFW_KEY_SPACE) == GLFW_RELEASE && previousReleaseValueOfSpace == GLFW_PRESS){
 				//The Minus is because positive x values come toward the viewer and positive Z values go to the left looking straght on at the table
-				launchBallSpeed = -pullerDistanceCovered*4.0f;
+				launchBallSpeed = -pullerDistanceCovered*7.0f;
 				Ball.speedX = launchBallSpeed;
 				// next line must be cancelled, only to test right wall
 				Ball.speedZ = Ball.speedX;
@@ -524,7 +527,7 @@ class MyProject : public BaseProject {
 		glm::vec4 AnyWallmaxYPositionVector = BodyPosition*glm::vec4(0.0f,topYMargin,0.0f,1.0f);
 
 		glm::vec4 TopWallminXPositionVector = BodyPosition*glm::vec4(topXMargin-sideWallDepth,0.0f,0.0f,1.0f);
-		glm::vec4 TopWallmaxXPositionVector = BodyPosition*glm::vec4(topXMargin,0.0f,1.0f,1.0f);
+		glm::vec4 TopWallmaxXPositionVector = BodyPosition*glm::vec4(topXMargin,0.0f,0.0f,1.0f);
 		glm::vec4 TopWallminZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,rightZMargin,1.0f);
 		glm::vec4 TopWallmaxZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,leftZMargin,1.0f);
 
@@ -537,7 +540,7 @@ class MyProject : public BaseProject {
 		TopWall.orientationWithRespectToNegativeZaxis = 3.14/2;
 
 		glm::vec4 RightWallminXPositionVector = BodyPosition*glm::vec4(topXMargin,0.0f,0.0f,1.0f);
-		glm::vec4 RightWallmaxXPositionVector = BodyPosition*glm::vec4(bottomXMargin,0.0f,1.0f,1.0f);
+		glm::vec4 RightWallmaxXPositionVector = BodyPosition*glm::vec4(bottomXMargin,0.0f,0.0f,1.0f);
 		glm::vec4 RightWallminZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,rightZMargin-sideWallDepth,1.0f);
 		glm::vec4 RightWallmaxZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,rightZMargin,1.0f);
 
@@ -551,7 +554,7 @@ class MyProject : public BaseProject {
 		RightWall.orientationWithRespectToNegativeZaxis = 0.0f;
 
 		glm::vec4 LeftWallminXPositionVector = BodyPosition*glm::vec4(topXMargin,0.0f,0.0f,1.0f);
-		glm::vec4 LeftWallmaxXPositionVector = BodyPosition*glm::vec4(bottomXMargin,0.0f,1.0f,1.0f);
+		glm::vec4 LeftWallmaxXPositionVector = BodyPosition*glm::vec4(bottomXMargin,0.0f,0.0f,1.0f);
 		glm::vec4 LeftWallminZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,leftZMargin,1.0f);
 		glm::vec4 LeftWallmaxZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,leftZMargin+sideWallDepth,1.0f);
 
@@ -564,7 +567,7 @@ class MyProject : public BaseProject {
 		LeftWall.orientationWithRespectToNegativeZaxis = 0.0f;
 
 		glm::vec4 BottomRightWallminXPositionVector = BodyPosition*glm::vec4(bottomXMargin,0.0f,0.0f,1.0f);
-		glm::vec4 BottomRightWallmaxXPositionVector = BodyPosition*glm::vec4(bottomXMargin+sideWallDepth,0.0f,1.0f,1.0f);
+		glm::vec4 BottomRightWallmaxXPositionVector = BodyPosition*glm::vec4(bottomXMargin+sideWallDepth,0.0f,0.0f,1.0f);
 		glm::vec4 BottomRightWallminZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,rightZMargin,1.0f);
 		glm::vec4 BottomRightWallmaxZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,rightFlipperMargin,1.0f);
 
@@ -577,7 +580,7 @@ class MyProject : public BaseProject {
 		BottomRightWall.orientationWithRespectToNegativeZaxis = -3.14/2;
 
 		glm::vec4 BottomLeftWallminXPositionVector = BodyPosition*glm::vec4(bottomXMargin,0.0f,0.0f,1.0f);
-		glm::vec4 BottomLeftWallmaxXPositionVector = BodyPosition*glm::vec4(bottomXMargin+sideWallDepth,0.0f,1.0f,1.0f);
+		glm::vec4 BottomLeftWallmaxXPositionVector = BodyPosition*glm::vec4(bottomXMargin+sideWallDepth,0.0f,0.0f,1.0f);
 		glm::vec4 BottomLeftWallminZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,leftFlipperMargin,1.0f);
 		glm::vec4 BottomLeftWallmaxZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,leftZMargin,1.0f);
 
@@ -588,11 +591,31 @@ class MyProject : public BaseProject {
 		BottomLeftWall.minZ = BottomLeftWallminZPositionVector.z;
 		BottomLeftWall.maxZ = BottomLeftWallmaxZPositionVector.z;
 		BottomLeftWall.orientationWithRespectToNegativeZaxis = -3.14/2;
+		
+		glm::vec4 LeftFlipperBottomLeftVector = LeftFlipperCurrentPosition*glm::vec4(0.174519f,0.0f,0.167087f,1.0f);
+		glm::vec4 LeftFlipperBottomRightVector = LeftFlipperCurrentPosition*glm::vec4(0.174519f,0.0f,-0.167087f,1.0f);
+		glm::vec4 LeftFlipperTopLeftVector = LeftFlipperCurrentPosition*glm::vec4(-0.919164f,0.0f, 0.092294 ,1.0f);
+		glm::vec4 LeftFlipperTopRightVector = LeftFlipperCurrentPosition*glm::vec4(-0.919164f,0.0f,-0.092294,1.0f);
+
+
+		LeftFlipperPoints.bottomLeftX = LeftFlipperBottomLeftVector.x;
+		LeftFlipperPoints.bottomLeftZ = LeftFlipperBottomLeftVector.z;
+		LeftFlipperPoints.bottomRightX = LeftFlipperBottomRightVector.x;
+		LeftFlipperPoints.bottomRightZ = LeftFlipperBottomRightVector.z;
+		LeftFlipperPoints.topLeftX = LeftFlipperTopLeftVector.x;
+		LeftFlipperPoints.topLeftZ = LeftFlipperTopLeftVector.z;
+		LeftFlipperPoints.topRightX = LeftFlipperTopRightVector.x;
+		LeftFlipperPoints.topRightZ = LeftFlipperTopRightVector.z;
+		LeftFlipperPoints.orientationWithRespectToNegativeZaxis = glm::radians(leftFlipperRotate-120.0f);
+		
+
+		std::cout<< "rightwall X: min"<<RightWall.minX<< " max "<< RightWall.maxX <<" min Z "<< RightWall.minZ <<" max  " <<RightWall.maxZ <<std::endl;
+		std::cout<< "rightwall Y: min"<<RightWall.minY<< " max "<< RightWall.minY<<std::endl;
 
 		std::cout<< "ball origin X:"<<Ball.originX<< " Y "<< Ball.originY<<" Z "<< Ball.originZ<<std::endl;
-		std::cout<< "right wall Y: min"<<RightWall.minY<< " max "<< RightWall.maxY<<" Z "<< Ball.originZ<<std::endl;
+		/* std::cout<< "right wall Y: min"<<RightWall.minY<< " max "<< RightWall.maxY<<" Z "<< Ball.originZ<<std::endl;
 		std::cout<< "ball speed X:"<<Ball.speedX<< " Y "<< Ball.speedY<<" Z "<< Ball.speedZ<<std::endl;
-		std::cout<< "ball speed in Global reference X:"<<BallSpeedWRTBody.x<< " Y "<< BallSpeedWRTBody.y<<" Z "<< BallSpeedWRTBody.z<<std::endl;
+		std::cout<< "ball speed in Global reference X:"<<BallSpeedWRTBody.x<< " Y "<< BallSpeedWRTBody.y<<" Z "<< BallSpeedWRTBody.z<<std::endl; */
 
 
 		Ball = intersectBallOrientedObstacle(Ball,RightWall);
@@ -600,8 +623,13 @@ class MyProject : public BaseProject {
 		Ball = intersectBallOrientedObstacle(Ball,TopWall);
 		Ball = intersectBallOrientedObstacle(Ball,BottomRightWall);
 		Ball = intersectBallOrientedObstacle(Ball,BottomLeftWall);
+		Ball = intersectBallObjectPointByPoint(Ball,LeftFlipperPoints);
+		
 
+		
 		// Movement of the models and drawing is described here
+
+		
 
 		ubo.model = BodyPosition;
 		// Camera Position parallell to the playing plane
