@@ -324,6 +324,7 @@ class MyProject : public BaseProject {
 		static OrientableObjectDimensions BottomRightWall;
 		static OrientableObjectDimensions BottomLeftWall;
 		static ObjectPointByPoint LeftFlipperPoints;
+		static ObjectPointByPoint RightFlipperPoints;
 		LeftFlipperPoints.name = "left flipper";
 		RightWall.name = "right wall";
 
@@ -607,6 +608,22 @@ class MyProject : public BaseProject {
 		LeftFlipperPoints.topRightX = LeftFlipperTopRightVector.x;
 		LeftFlipperPoints.topRightZ = LeftFlipperTopRightVector.z;
 		LeftFlipperPoints.orientationWithRespectToNegativeZaxis = glm::radians(leftFlipperRotate-120.0f);
+
+		glm::vec4 RightFlipperBottomLeftVector = RightFlipperCurrentPosition*glm::vec4(0.174519f,0.0f,0.167087f,1.0f);
+		glm::vec4 RightFlipperBottomRightVector = RightFlipperCurrentPosition*glm::vec4(0.174519f,0.0f,-0.167087f,1.0f);
+		glm::vec4 RightFlipperTopLeftVector = RightFlipperCurrentPosition*glm::vec4(-0.919164f,0.0f, 0.092294 ,1.0f);
+		glm::vec4 RightFlipperTopRightVector = RightFlipperCurrentPosition*glm::vec4(-0.919164f,0.0f,-0.092294,1.0f);
+
+
+		RightFlipperPoints.bottomLeftX = RightFlipperBottomLeftVector.x;
+		RightFlipperPoints.bottomLeftZ = RightFlipperBottomLeftVector.z;
+		RightFlipperPoints.bottomRightX = RightFlipperBottomRightVector.x;
+		RightFlipperPoints.bottomRightZ = RightFlipperBottomRightVector.z;
+		RightFlipperPoints.topLeftX = RightFlipperTopLeftVector.x;
+		RightFlipperPoints.topLeftZ = RightFlipperTopLeftVector.z;
+		RightFlipperPoints.topRightX = RightFlipperTopRightVector.x;
+		RightFlipperPoints.topRightZ = RightFlipperTopRightVector.z;
+		RightFlipperPoints.orientationWithRespectToNegativeZaxis = glm::radians(rightFlipperRotate+120.0f);
 		
 
 		std::cout<< "rightwall X: min"<<RightWall.minX<< " max "<< RightWall.maxX <<" min Z "<< RightWall.minZ <<" max  " <<RightWall.maxZ <<std::endl;
@@ -624,6 +641,7 @@ class MyProject : public BaseProject {
 		Ball = intersectBallOrientedObstacle(Ball,BottomRightWall);
 		Ball = intersectBallOrientedObstacle(Ball,BottomLeftWall);
 		Ball = intersectBallObjectPointByPoint(Ball,LeftFlipperPoints);
+		Ball = intersectBallObjectPointByPoint(Ball,RightFlipperPoints);
 		
 
 		

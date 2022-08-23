@@ -234,7 +234,7 @@ bool pointIsInside(float testPointX, float testPointZ, ObjectPointByPoint prism)
 }
 
 MovingRotationalObjectDimensions intersectBallObjectPointByPoint(MovingRotationalObjectDimensions ball, ObjectPointByPoint b) {
-	float angleResolution = 8;
+	float angleResolution = 32;
 	float angleIncrement = 360.0f / angleResolution;
 		
 	// This should give us the angle of the ball movement with respect to  natural axis with Z new to the right and Xnew ging away from the User
