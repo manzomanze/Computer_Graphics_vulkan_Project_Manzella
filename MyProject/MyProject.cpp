@@ -454,6 +454,21 @@ class MyProject : public BaseProject {
 
 		}
 		
+		if(glfwGetKey(window,GLFW_KEY_I)){
+				ballX = ballX-2.0f*deltaT;
+			}
+			if(glfwGetKey(window,GLFW_KEY_K)){
+				ballX = ballX+2.0f*deltaT;
+			}
+
+
+			if(glfwGetKey(window,GLFW_KEY_J)){
+				ballZ = ballZ+2.0f*deltaT;
+			}
+			if(glfwGetKey(window,GLFW_KEY_L)){
+				ballZ = ballZ-2.0f*deltaT;
+			}
+
 	
 
 		
