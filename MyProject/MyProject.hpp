@@ -36,8 +36,9 @@
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
-const float ballRadius = 0.15f;
+const float ballRadius = 0.20f;
 const float sideWallDepth = 0.30f;
+const float effectOfCollisionOnSpeed = 1.0;
 
 // Lesson 22.0
 const std::vector<const char*> validationLayers = {
@@ -164,7 +165,7 @@ bool intersect(ObjectDimensions a, ObjectDimensions b) {
          
 }
 
-bool intersectBall(MovingRotationalObjectDimensions a, ObjectDimensions b) {
+/* bool intersectBall(MovingRotationalObjectDimensions a, ObjectDimensions b) {
   float angleResolution = 24;
   float angleIncrement = 360.0f / angleResolution;
   
@@ -176,7 +177,7 @@ bool intersectBall(MovingRotationalObjectDimensions a, ObjectDimensions b) {
 	}
 	
 	return false;
-}
+} */
   
 MovingRotationalObjectDimensions intersectBallOrientedObstacle(MovingRotationalObjectDimensions ball, OrientableObjectDimensions b) {
 	float angleResolution = 8;
@@ -198,8 +199,8 @@ MovingRotationalObjectDimensions intersectBallOrientedObstacle(MovingRotationalO
 		if((ball.originX - glm::sin(i * angleIncrement)*ballRadius <= b.maxX && ball.originX - glm::sin(i * angleIncrement)*ballRadius >= b.minX) &&
 			(ball.originZ - glm::cos(i * angleIncrement)*ballRadius <= b.maxZ && ball.originZ - glm::cos(i * angleIncrement)*ballRadius >= b.minZ) && 
 			(ball.originY  <= b.maxY && ball.originY  >= b.minY)){
-				ball.speedX = -newBallSpeed.y;
-				ball.speedZ = -newBallSpeed.x;
+				ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed;
+				ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed;
 				return ball;
 		}
 	}	
@@ -226,15 +227,15 @@ bool pointIsInside(float testPointX, float testPointZ, ObjectPointByPoint prism)
 	bool secondEdge = pointIsleftToTheVector(testPointX,testPointZ,prism.topRightX,prism.topRightZ,prism.bottomRightX,prism.bottomRightZ);
 	bool thirdEdge = pointIsleftToTheVector(testPointX,testPointZ,prism.topLeftX,prism.topLeftZ,prism.topRightX,prism.topRightZ);
 	bool fourthEdge = pointIsleftToTheVector(testPointX,testPointZ,prism.bottomLeftX,prism.bottomLeftZ,prism.topLeftX,prism.topLeftZ);
-	std::cout<<std::endl;
+	/* std::cout<<std::endl;
 
-	std::cout<<firstEdge<<secondEdge<<thirdEdge<<fourthEdge<<std::endl;
+	std::cout<<firstEdge<<secondEdge<<thirdEdge<<fourthEdge<<std::endl; */
 	if(firstEdge && secondEdge && thirdEdge && fourthEdge){return true;}
 	return false;
 }
 
 MovingRotationalObjectDimensions intersectBallObjectPointByPoint(MovingRotationalObjectDimensions ball, ObjectPointByPoint b) {
-	float angleResolution = 32;
+	float angleResolution = 8;
 	float angleIncrement = 360.0f / angleResolution;
 		
 	// This should give us the angle of the ball movement with respect to  natural axis with Z new to the right and Xnew ging away from the User
@@ -259,8 +260,8 @@ MovingRotationalObjectDimensions intersectBallObjectPointByPoint(MovingRotationa
 		float testPointZ = ball.originZ - glm::cos(i * angleIncrement)*ballRadius;
 
 		if(pointIsInside(testPointX,testPointZ,b)){
-			ball.speedX = -newBallSpeed.y;
-			ball.speedZ = -newBallSpeed.x;
+			ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed;
+			ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed;
 			return ball; 
 		}
 	
