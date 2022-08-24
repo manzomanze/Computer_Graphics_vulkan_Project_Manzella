@@ -331,7 +331,6 @@ class MyProject : public BaseProject {
 
 		static float leftFlipperRotate = 0.0f;
 		static float rightFlipperRotate = 0.0f;
-		static float flipperRotateSpeed = 200.0f;
 		static float gravityconstant = 1.0f;
 		static float activeGravity = 0.0f;
 
@@ -640,8 +639,8 @@ class MyProject : public BaseProject {
 		Ball = intersectBallOrientedObstacle(Ball,TopWall);
 		Ball = intersectBallOrientedObstacle(Ball,BottomRightWall);
 		Ball = intersectBallOrientedObstacle(Ball,BottomLeftWall);
-		Ball = intersectBallObjectPointByPoint(Ball,LeftFlipperPoints);
-		Ball = intersectBallObjectPointByPoint(Ball,RightFlipperPoints);
+		Ball = intersectBallObjectPointByPoint(Ball,LeftFlipperPoints,LeftFlipperBottomLeftVector);
+		Ball = intersectBallObjectPointByPoint(Ball,RightFlipperPoints,RightFlipperBottomRightVector);
 		
 
 		

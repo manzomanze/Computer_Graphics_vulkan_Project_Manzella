@@ -15,6 +15,7 @@
 #include <fstream>
 #include <array>
 #include <math.h>
+#include <cmath>
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
@@ -39,6 +40,8 @@ const int MAX_FRAMES_IN_FLIGHT = 2;
 const float ballRadius = 0.20f;
 const float sideWallDepth = 0.30f;
 const float effectOfCollisionOnSpeed = 1.0;
+const float flipperRotateSpeed = 200.0f;
+const float coeffiecientOfFlipperBallSpeed = 0.007f;
 
 // Lesson 22.0
 const std::vector<const char*> validationLayers = {
@@ -234,7 +237,13 @@ bool pointIsInside(float testPointX, float testPointZ, ObjectPointByPoint prism)
 	return false;
 }
 
-MovingRotationalObjectDimensions intersectBallObjectPointByPoint(MovingRotationalObjectDimensions ball, ObjectPointByPoint b) {
+float calculateDistanceFromFlipperFulcrum(float testPointX, float testPointZ, glm::vec4 FlipperFulcrum){
+
+	return sqrt(pow(testPointX-FlipperFulcrum.x, 2)+pow(testPointZ-FlipperFulcrum.z, 2));
+
+}
+
+MovingRotationalObjectDimensions intersectBallObjectPointByPoint(MovingRotationalObjectDimensions ball, ObjectPointByPoint b, glm::vec4 FlipperFulcrum) {
 	float angleResolution = 8;
 	float angleIncrement = 360.0f / angleResolution;
 		
@@ -259,9 +268,13 @@ MovingRotationalObjectDimensions intersectBallObjectPointByPoint(MovingRotationa
 		float testPointX = ball.originX - glm::sin(i * angleIncrement)*ballRadius;
 		float testPointZ = ball.originZ - glm::cos(i * angleIncrement)*ballRadius;
 
+
+
 		if(pointIsInside(testPointX,testPointZ,b)){
-			ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed;
-			ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed;
+			float distanceFromFlipperFulcrum = calculateDistanceFromFlipperFulcrum(testPointX,testPointZ,FlipperFulcrum);
+
+			ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed-coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
+			ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed-coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
 			return ball; 
 		}
 	
