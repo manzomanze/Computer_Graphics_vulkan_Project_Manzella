@@ -409,19 +409,19 @@ class MyProject : public BaseProject {
 		//definition of physics interacting objects
 
 		static MovingRotationalObjectDimensions Ball;
-		static OrientableObjectDimensions TopWall;
+		/* static OrientableObjectDimensions TopWall;
 		static OrientableObjectDimensions RightWall;
 		static OrientableObjectDimensions LeftWall;
 		static OrientableObjectDimensions BottomRightWall;
-		static OrientableObjectDimensions BottomLeftWall;
+		static OrientableObjectDimensions BottomLeftWall; */
 		static ObjectPointByPoint LeftFlipperPoints;
 		static ObjectPointByPoint RightFlipperPoints;
 		static RotationalObjectDimensions LeftBumper;
 		static RotationalObjectDimensions CentreBumper;
 		static RotationalObjectDimensions RightBumper;
-		LeftFlipperPoints.name = "left flipper";
+/* 		LeftFlipperPoints.name = "left flipper";
 		RightWall.name = "right wall";
-
+ */
 
 		static float leftFlipperRotate = 0.0f;
 		static float rightFlipperRotate = 0.0f;
@@ -617,7 +617,7 @@ class MyProject : public BaseProject {
 
 
 
-		glm::vec4 AnyWallminYPositionVector = BodyPosition*glm::vec4(0.0f,bottomYMargin,0.0f,1.0f);
+	/* 		glm::vec4 AnyWallminYPositionVector = BodyPosition*glm::vec4(0.0f,bottomYMargin,0.0f,1.0f);
 		glm::vec4 AnyWallmaxYPositionVector = BodyPosition*glm::vec4(0.0f,topYMargin,0.0f,1.0f);
 
 		glm::vec4 TopWallminXPositionVector = BodyPosition*glm::vec4(topXMargin-sideWallDepth,0.0f,0.0f,1.0f);
@@ -684,8 +684,16 @@ class MyProject : public BaseProject {
 		BottomLeftWall.maxY = AnyWallmaxYPositionVector.y;
 		BottomLeftWall.minZ = BottomLeftWallminZPositionVector.z;
 		BottomLeftWall.maxZ = BottomLeftWallmaxZPositionVector.z;
-		BottomLeftWall.orientationWithRespectToNegativeZaxis = -3.14/2;
-		
+		BottomLeftWall.orientationWithRespectToNegativeZaxis = -3.14/2; 
+	*/
+		float FlipperBottomLeftX = 0.174519f;
+		float FlipperBottomLeftZ = 0.167087f
+		float FlipperBottomRightX = 0.174519f;
+		float FlipperBottomRightZ = -0.167087f
+		float FlipperTopLeftX = -0.919164f;
+		float FlipperTopLeftZ = 0.167087f;
+		float FlipperTopRightX = 0.092294;
+		float FlipperTopRightZ = -0.092294;
 		glm::vec4 LeftFlipperBottomLeftVector = LeftFlipperCurrentPosition*glm::vec4(0.174519f,0.0f,0.167087f,1.0f);
 		glm::vec4 LeftFlipperBottomRightVector = LeftFlipperCurrentPosition*glm::vec4(0.174519f,0.0f,-0.167087f,1.0f);
 		glm::vec4 LeftFlipperTopLeftVector = LeftFlipperCurrentPosition*glm::vec4(-0.919164f,0.0f, 0.092294 ,1.0f);
@@ -743,21 +751,46 @@ class MyProject : public BaseProject {
 		RightBumper.originZ = RightBumperCurrentPositionvector.z;
 		RightBumper.radius = 0.2f;	
 
-		std::cout<< "rightwall X: min"<<RightWall.minX<< " max "<< RightWall.maxX <<" min Z "<< RightWall.minZ <<" max  " <<RightWall.maxZ <<std::endl;
-		std::cout<< "rightwall Y: min"<<RightWall.minY<< " max "<< RightWall.minY<<std::endl;
+		/* std::cout<< "rightwall X: min"<<RightWall.minX<< " max "<< RightWall.maxX <<" min Z "<< RightWall.minZ <<" max  " <<RightWall.maxZ <<std::endl;
+		std::cout<< "rightwall Y: min"<<RightWall.minY<< " max "<< RightWall.minY<<std::endl; */
 
 		std::cout<< "ball origin X:"<<Ball.originX<< " Y "<< Ball.originY<<" Z "<< Ball.originZ<<std::endl;
 		/* std::cout<< "right wall Y: min"<<RightWall.minY<< " max "<< RightWall.maxY<<" Z "<< Ball.originZ<<std::endl;
 		std::cout<< "ball speed X:"<<Ball.speedX<< " Y "<< Ball.speedY<<" Z "<< Ball.speedZ<<std::endl;
 		std::cout<< "ball speed in Global reference X:"<<BallSpeedWRTBody.x<< " Y "<< BallSpeedWRTBody.y<<" Z "<< BallSpeedWRTBody.z<<std::endl; */
 
+		Wall TopWall(topXMargin-sideWallDepth, topXMargin, bottomYMargin, topYMargin, rightZMargin, leftZMargin, 3.14/2, 
+			"top-wall", BodyPosition);
+		
+		Wall RightWall(topXMargin, bottomXMargin, bottomYMargin, topYMargin, rightZMargin-sideWallDepth, rightZMargin, 0.0f, 
+			"right-wall", BodyPosition);
 
-		Ball = intersectBallOrientedObstacle(Ball,RightWall);
-		Ball = intersectBallOrientedObstacle(Ball,LeftWall);
-		Ball = intersectBallOrientedObstacle(Ball,TopWall);
-		Ball = intersectBallOrientedObstacle(Ball,BottomRightWall);
-		Ball = intersectBallOrientedObstacle(Ball,BottomLeftWall);
-		Ball = intersectBallObjectPointByPoint(Ball,LeftFlipperPoints,LeftFlipperBottomLeftVector);
+		Wall LeftWall(topXMargin, bottomXMargin, bottomYMargin, topYMargin, leftZMargin, leftZMargin+sideWallDepth, 0.0f, 
+			"right-wall", BodyPosition);
+		
+		Wall BottomRightWall(bottomXMargin, bottomXMargin+sideWallDepth, bottomYMargin, topYMargin, rightZMargin, rightFlipperMargin, -3.14/2, 
+			"bottom-right-wall", BodyPosition);
+
+		Wall BottomLeftWall(bottomXMargin, bottomXMargin+sideWallDepth, bottomYMargin, topYMargin, leftFlipperMargin, leftZMargin, -3.14/2, 
+			"bottom-right-wall", BodyPosition);
+		
+		
+		Flipper LeftFlipperTest(FlipperBottomLeftX, FlipperBottomLeftZ, FlipperBottomRightX, FlipperBottomRightZ, FlipperTopLeftX, FlipperTopLeftZ, FlipperTopRightX, FlipperTopRightZ, leftFlipperRotate-120.0f, "left-flipper, ",LeftFlipperCurrentPosition);
+		
+
+
+		/* Ball = intersectBallOrientedObstacle(Ball,RightWall); */
+		Ball = RightWall.bounceBall(Ball);
+		Ball = TopWall.bounceBall(Ball);
+		Ball = LeftWall.bounceBall(Ball);
+		/* Ball = intersectBallOrientedObstacle(Ball,LeftWall); */
+		/* Ball = intersectBallOrientedObstacle(Ball,TopWall); */
+		/* Ball = intersectBallOrientedObstacle(Ball,BottomRightWall);
+		Ball = intersectBallOrientedObstacle(Ball,BottomLeftWall); */
+		Ball = BottomRightWall.bounceBall(Ball);
+		Ball = BottomLeftWall.bounceBall(Ball);
+		Ball = LeftFlipperTest.bounceBall(Ball)
+		/* Ball = intersectBallObjectPointByPoint(Ball,LeftFlipperPoints,LeftFlipperBottomLeftVector); */
 		Ball = intersectBallObjectPointByPoint(Ball,RightFlipperPoints,RightFlipperBottomRightVector);
 		Ball = intersectBallObjectRotationalObject(Ball,LeftBumper);
 		Ball = intersectBallObjectRotationalObject(Ball,CentreBumper);

@@ -325,6 +325,340 @@ MovingRotationalObjectDimensions intersectBallObjectRotationalObject(MovingRotat
 }
 
 
+
+
+class Object2D {       
+	private:             
+		std::string name;        
+		float originX;
+		float originZ;
+		glm::mat4 mainTransformationMatrix; 
+
+	protected: 
+
+		void setOriginX(float originXinput);
+		void setOriginZ(float originZinput);
+		void setName(std::string nameinput);
+	
+	public: 
+
+		Object2D(std::string nameinput, float originXinput, float originZinput, glm::mat4 mainTransformationMatrixinput) {     // Constructor
+			name = nameinput;
+			originX = originXinput;
+			originZ = originZinput;
+			mainTransformationMatrix = mainTransformationMatrixinput;
+		}
+
+		float getOriginX();
+		float getOriginZ();
+		std::string getName();
+		glm::mat4 getTransformationMatrix();
+
+		
+};
+
+void Object2D::setOriginX(float originXinput){
+	originX = originXinput;
+}
+void Object2D::setOriginZ(float originZinput){
+	originZ = originZinput;
+}
+
+void Object2D::setName(std::string nameinput){
+	name = nameinput;
+} 
+
+float Object2D::getOriginX(){
+	return originX;
+}
+float Object2D::getOriginZ(){
+	return originZ;
+}
+std::string Object2D::getName(){
+	return name;
+} 
+
+glm::mat4 Object2D::getTransformationMatrix(){
+	return mainTransformationMatrix;
+}
+
+
+class MovingObject2D : public Object2D{       
+	private:
+		float speedX;
+		float speedZ;
+		float rotationAngle;
+
+	protected:
+		void setSpeedX(float speedXinput);
+		void setSpeedZ(float speedZinput);
+		void setRotationAngle(float rotationAngleinput);
+
+	public: 
+
+		MovingObject2D(std::string nameinput, float originXinput, float originZinput, glm::mat4 mainTransformationMatrixinput, float speedXinput, float speedZinput) : Object2D(nameinput, originXinput, originZinput, mainTransformationMatrixinput){     // Constructor
+
+			speedX = speedXinput;
+			speedZ = speedZinput;
+		}	
+	
+		float getSpeedX();
+		float getSpeedZ();
+		float getRotationAngle();
+}; 
+
+// methods of MovingObject2D class
+
+	float MovingObject2D::getSpeedX(){
+		return speedX;
+	}
+	float MovingObject2D::getSpeedZ(){
+		return speedZ;
+	}
+
+	float MovingObject2D::getRotationAngle(){
+		return rotationAngle;
+	}
+
+	void MovingObject2D::setSpeedX(float speedXinput){
+		speedX = speedXinput;
+	}
+	void MovingObject2D::setSpeedZ(float speedZinput){
+		speedZ = speedZinput;
+	}
+	void MovingObject2D::setRotationAngle(float rotationAngleinput){
+		rotationAngle = rotationAngleinput;
+	}
+
+
+
+
+class Wall : public MovingObject2D{       
+	private:
+		float minX;
+		float maxX;
+		float minY;
+		float maxY;
+		float minZ;
+		float maxZ;
+
+	public: 
+
+		Wall(float minXinput, float maxXinput, float minYinput, float maxYinput, float minZinput, float maxZinput, float rotationAngleinput, 
+			std::string nameinput,  glm::mat4 mainTransformationMatrixinput) 
+				: MovingObject2D(nameinput, 0.0f,0.0f, mainTransformationMatrixinput, 0.0f,0.0f){     // Constructor
+
+			glm::vec4 WallminXPositionVector = mainTransformationMatrixinput*glm::vec4(minXinput,0.0f,0.0f,1.0f);
+			glm::vec4 WallmaxXPositionVector = mainTransformationMatrixinput*glm::vec4(maxXinput,0.0f,0.0f,1.0f);
+
+			glm::vec4 WallminYPositionVector = mainTransformationMatrixinput*glm::vec4(0.0f,minYinput,0.0f,1.0f);
+			glm::vec4 WallmaxYPositionVector = mainTransformationMatrixinput*glm::vec4(0.0f,maxYinput,0.0f,1.0f);
+
+			std::cout<<maxXinput<<std::endl;
+			std::cout<<WallmaxXPositionVector.y<<std::endl;
+
+			glm::vec4 WallminZPositionVector = mainTransformationMatrixinput*glm::vec4(0.0f,0.0f,minZinput,1.0f);
+			glm::vec4 WallmaxZPositionVector = mainTransformationMatrixinput*glm::vec4(0.0f,0.0f,maxZinput,1.0f);
+
+			this->setRotationAngle(rotationAngleinput);
+			
+			minX = WallminXPositionVector.x;
+			maxX = WallmaxXPositionVector.x;
+			minY = WallminYPositionVector.y;
+			maxY = WallmaxYPositionVector.y;
+			minZ = WallminZPositionVector.z;
+			maxZ = WallmaxZPositionVector.z;
+		}
+
+		MovingRotationalObjectDimensions bounceBall (MovingRotationalObjectDimensions ball);
+		float getminX();
+		float getmaxX();
+		float getminY();
+		float getmaxY();
+		float getminZ();
+		float getmaxZ();
+		
+}; 
+// methods of Wall class
+
+	float Wall::getminX(){
+	return minX;
+	}
+	float Wall::getmaxX(){
+		return maxX;
+	}
+	float Wall::getminY(){
+		return minY;
+	}
+
+	float Wall::getmaxY(){
+		return maxY;
+	}
+	float Wall::getminZ(){
+		return minZ;
+	}
+
+	float Wall::getmaxZ(){
+		return maxZ;
+	}
+
+	MovingRotationalObjectDimensions Wall::bounceBall (MovingRotationalObjectDimensions ball){
+		float angleResolution = 8;
+		float angleIncrement = 360.0f / angleResolution;
+			
+		// This should give us the angle of the ball movement with respect to  natural axis with Z new to the right and Xnew ging away from the User
+		float ballMovementAngle = atan2(-ball.speedX,-ball.speedZ);
+		/* std::cout<<ballMovementAngle<<std::endl; */
+
+		//collision calculation using vectors
+		glm::vec2 ballSpeed = glm::vec2(-ball.speedZ,-ball.speedX);
+		glm::vec2 normal = glm::vec2(-glm::cos(this->getRotationAngle()),-glm::sin(this->getRotationAngle()));
+		glm::vec2 u = (glm::dot(ballSpeed,normal)/glm::dot(normal,normal))*normal;
+		glm::vec2 W = ballSpeed - u;
+		glm::vec2 newBallSpeed = W - u;
+		//std::cout<< "speed NEWWW X:"<<newBallSpeed.x<< " Z "<< newBallSpeed.y<<std::endl;
+		//std::cout << "AAAAAAAAAAAAAAAAAAAa"<<std::endl;
+		/* std::cout<< "rightwall X: min"<<this->getminX()<< " max "<< this->getmaxX() <<" min Z "<< this->getminZ() <<" max  " <<this->getmaxZ() <<std::endl;
+			std::cout<< "rightwall Y: min"<<this->getminY()<< " max "<< this->getminY()<<std::endl; */
+	
+		for(int i = 0; i<angleResolution;i++){
+			if((ball.originX - glm::sin(i * angleIncrement)*ballRadius <= this->getmaxX() && ball.originX - glm::sin(i * angleIncrement)*ballRadius >= this->getminX()) &&
+				(ball.originZ - glm::cos(i * angleIncrement)*ballRadius <= this->getmaxZ() && ball.originZ - glm::cos(i * angleIncrement)*ballRadius >= this->getminZ()) /* && 
+				(ball.originY  <= this->getmaxY() && ball.originY  >= this->getminY()) */){
+					ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed;
+					ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed;
+					return ball;
+			}
+		}	
+
+		return ball;     
+	}
+	
+
+class Flipper : public MovingObject2D{       
+	private:
+		float bottomLeftX;
+		float bottomLeftZ;
+		float bottomRightX;
+		float bottomRightZ;
+		float topLeftX;
+		float topLeftZ;
+		float topRightX;
+		float topRightZ;
+		glm::vec4 FlipperCurrentPositionvector;
+		
+
+	public: 
+	
+
+		Flipper(float bottomLeftXinput, float bottomLeftZinput, float bottomRightXinput, float bottomRightZinput, float topLeftXinput, float topLeftZinput, float topRightXinput, float topRightZinput,
+			std::string nameinput,  glm::mat4 mainTransformationMatrixinput) 
+				: MovingObject2D(nameinput, 0.0f,0.0f, mainTransformationMatrixinput, 0.0f,0.0f){     // Constructor
+
+			FlipperCurrentPositionvector = mainTransformationMatrixinput*glm::vec4(1.0f,1.0f,1.0f,1.0f);
+			FlipperCurrentPositionvector = glm::vec4(FlipperCurrentPositionvector.x-1.0f,FlipperCurrentPositionvector.y-1.0f,FlipperCurrentPositionvector.z-1.0f,FlipperCurrentPositionvector.w-1.0f);
+
+			glm::vec4 FlipperBottomLeftVector = mainTransformationMatrixinput*glm::vec4(bottomLeftXinput,0.0f,bottomLeftZinput,1.0f);
+			glm::vec4 FlipperBottomRightVector = mainTransformationMatrixinput*glm::vec4(bottomRightXinput,0.0f,bottomRightZinput,1.0f);
+			glm::vec4 FlipperTopLeftVector = mainTransformationMatrixinput*glm::vec4(topLeftXinput,0.0f,topLeftZinput,1.0f);
+			glm::vec4 FlipperTopRightVector = mainTransformationMatrixinput*glm::vec4(topRightXinput,0.0f,topRightZinput,1.0f);
+
+
+			this->setRotationAngle(rotationAngleinput);
+			
+			bottomLeftX = FlipperBottomLeftVector.x;
+			bottomLeftZ = FlipperBottomLeftVector.z;
+			bottomRightX = FlipperBottomRightVector.x;
+			bottomRightZ = FlipperBottomRightVector.z;
+			topLeftX = FlipperTopLeftVector.x;
+			topLeftZ = FlipperTopLeftVector.z;
+			topRightX = FlipperTopRightVector.x;
+			topRightZ = FlipperTopRightVector.z;
+		}
+
+		MovingRotationalObjectDimensions bounceBall (MovingRotationalObjectDimensions ball);
+
+
+		float bottomLeftX();
+		float bottomLeftZ();
+		float bottomRightX();
+		float bottomRightZ();
+		float topLeftX();
+		float topLeftZ();
+		float topRightX();
+		float topRightZ();
+		
+}; 
+
+
+	float Flipper::bottomLeftX(){
+	return bottomLeftX;
+	}
+	float Flipper::bottomLeftZ(){
+		return bottomLeftZ;
+	}
+	float Flipper::bottomRightX(){
+		return bottomRightX;
+	}
+
+	float Flipper::bottomRightZ(){
+		return bottomRightZ;
+	}
+	float Flipper::topLeftX(){
+		return topLeftX;
+	}
+
+	float Flipper::topLeftZ(){
+		return topLeftZ;
+	}
+
+	float Flipper::topRightX(){
+		return topRightX;
+	}
+
+	float Flipper::topRightZ(){
+		return topRightZ;
+	}
+
+	MovingRotationalObjectDimensions Flipper::bounceBall(MovingRotationalObjectDimensions ball) {
+	float angleResolution = 8;
+	float angleIncrement = 360.0f / angleResolution;
+		
+	// This should give us the angle of the ball movement with respect to  natural axis with Z new to the right and Xnew ging away from the User
+	float ballMovementAngle = atan2(-ball.speedX,-ball.speedZ);
+	/* std::cout<<ballMovementAngle<<std::endl; */
+
+	
+
+	//collision calculation using vectors
+	glm::vec2 ballSpeed = glm::vec2(-ball.speedZ,-ball.speedX);
+	glm::vec2 normal = glm::vec2(-glm::cos(this->getRotationAngle()),-glm::sin(this->getRotationAngle()));
+	glm::vec2 u = (glm::dot(ballSpeed,normal)/glm::dot(normal,normal))*normal;
+	glm::vec2 W = ballSpeed - u;
+	glm::vec2 newBallSpeed = W - u;
+	//std::cout<< "speed NEWWW X:"<<newBallSpeed.x<< " Z "<< newBallSpeed.y<<std::endl;
+  
+	
+
+
+	for(int i = 0; i<angleResolution;i++){
+		float testPointX = ball.originX - glm::sin(i * angleIncrement)*ballRadius;
+		float testPointZ = ball.originZ - glm::cos(i * angleIncrement)*ballRadius;
+
+		if(pointIsInside(testPointX,testPointZ,b)){
+			float distanceFromFlipperFulcrum = calculateDistanceFromFlipperFulcrum(testPointX,testPointZ,FlipperCurrentPositionvector);
+
+			ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed-coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
+			ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed-coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
+			return ball; 
+		}
+	
+	}  
+
+  	return ball; 
+	  
+}
+
 //// For debugging - Lesson 22.0
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
 			const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
