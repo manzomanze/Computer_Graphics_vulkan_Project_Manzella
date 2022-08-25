@@ -153,6 +153,7 @@ struct RotationalObjectDimensions{
 	float originX;
 	float originY;
 	float originZ;
+	float radius;
 };
 
 struct MovingRotationalObjectDimensions : RotationalObjectDimensions{
@@ -268,8 +269,6 @@ MovingRotationalObjectDimensions intersectBallObjectPointByPoint(MovingRotationa
 		float testPointX = ball.originX - glm::sin(i * angleIncrement)*ballRadius;
 		float testPointZ = ball.originZ - glm::cos(i * angleIncrement)*ballRadius;
 
-
-
 		if(pointIsInside(testPointX,testPointZ,b)){
 			float distanceFromFlipperFulcrum = calculateDistanceFromFlipperFulcrum(testPointX,testPointZ,FlipperFulcrum);
 
@@ -277,6 +276,47 @@ MovingRotationalObjectDimensions intersectBallObjectPointByPoint(MovingRotationa
 			ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed-coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
 			return ball; 
 		}
+	
+	}  
+
+  	return ball; 
+	  
+}
+
+
+MovingRotationalObjectDimensions intersectBallObjectRotationalObject(MovingRotationalObjectDimensions ball, RotationalObjectDimensions b) {
+	float angleResolution = 8;
+	float angleIncrement = 360.0f / angleResolution;
+		
+	// This should give us the angle of the ball movement with respect to  natural axis with Z new to the right and Xnew ging away from the User
+	float ballMovementAngle = atan2(-ball.speedX,-ball.speedZ);
+	/* std::cout<<ballMovementAngle<<std::endl; */
+
+	
+
+	//collision calculation using vectors
+	glm::vec2 ballSpeed = glm::vec2(-ball.speedZ,-ball.speedX);
+	glm::vec2 normal = glm::vec2(-glm::cos(atan2(ball.originX-b.originX,ball.originZ-b.originZ)),-glm::sin(atan2(ball.originX-b.originX,ball.originZ-b.originZ)));
+	glm::vec2 u = (glm::dot(ballSpeed,normal)/glm::dot(normal,normal))*normal;
+	glm::vec2 W = ballSpeed - u;
+	glm::vec2 newBallSpeed = W - u;
+	//std::cout<< "speed NEWWW X:"<<newBallSpeed.x<< " Z "<< newBallSpeed.y<<std::endl;
+  
+	
+
+
+	for(int i = 0; i<angleResolution;i++){
+		float testPointX = ball.originX - glm::sin(i * angleIncrement)*ballRadius;
+		float testPointZ = ball.originZ - glm::cos(i * angleIncrement)*ballRadius;
+
+		if(sqrt(pow(ball.originX-b.originX,2)+pow(ball.originZ-b.originZ,2)) < b.radius+ballRadius){
+			ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed;
+			ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed;
+			return ball; 
+		}
+
+		
+		
 	
 	}  
 

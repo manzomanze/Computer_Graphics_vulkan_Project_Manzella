@@ -416,6 +416,9 @@ class MyProject : public BaseProject {
 		static OrientableObjectDimensions BottomLeftWall;
 		static ObjectPointByPoint LeftFlipperPoints;
 		static ObjectPointByPoint RightFlipperPoints;
+		static RotationalObjectDimensions LeftBumper;
+		static RotationalObjectDimensions CentreBumper;
+		static RotationalObjectDimensions RightBumper;
 		LeftFlipperPoints.name = "left flipper";
 		RightWall.name = "right wall";
 
@@ -714,7 +717,31 @@ class MyProject : public BaseProject {
 		RightFlipperPoints.topRightX = RightFlipperTopRightVector.x;
 		RightFlipperPoints.topRightZ = RightFlipperTopRightVector.z;
 		RightFlipperPoints.orientationWithRespectToNegativeZaxis = glm::radians(rightFlipperRotate+120.0f);
-		
+
+
+		glm::mat4 LeftBumperCurrentPosition = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,0.2f,1.5f))*BodyPosition;
+		glm::vec4 LeftBumperCurrentPositionvector = LeftBumperCurrentPosition*glm::vec4(1.0f,1.0f,1.0f,1.0f);
+		LeftBumperCurrentPositionvector = glm::vec4(LeftBumperCurrentPositionvector.x-1.0f,LeftBumperCurrentPositionvector.y-1.0f,LeftBumperCurrentPositionvector.z-1.0f,LeftBumperCurrentPositionvector.w-1.0f);
+
+		LeftBumper.originX = LeftBumperCurrentPositionvector.x;
+		LeftBumper.originZ = LeftBumperCurrentPositionvector.z;
+		LeftBumper.radius = 0.2f;	
+
+		glm::mat4 CentreBumperCurrentPosition = glm::translate(glm::mat4(1.0f),glm::vec3(-1.0f,0.2f,0.0f))*BodyPosition;
+		glm::vec4 CentreBumperCurrentPositionvector = CentreBumperCurrentPosition*glm::vec4(1.0f,1.0f,1.0f,1.0f);
+		CentreBumperCurrentPositionvector = glm::vec4(CentreBumperCurrentPositionvector.x-1.0f,CentreBumperCurrentPositionvector.y-1.0f,CentreBumperCurrentPositionvector.z-1.0f,CentreBumperCurrentPositionvector.w-1.0f);
+
+		CentreBumper.originX = CentreBumperCurrentPositionvector.x;
+		CentreBumper.originZ = CentreBumperCurrentPositionvector.z;
+		CentreBumper.radius = 0.2f;		
+
+		glm::mat4 RightBumperCurrentPosition = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,0.2f,-1.5f))*BodyPosition;
+		glm::vec4 RightBumperCurrentPositionvector = RightBumperCurrentPosition*glm::vec4(1.0f,1.0f,1.0f,1.0f);
+		RightBumperCurrentPositionvector = glm::vec4(RightBumperCurrentPositionvector.x-1.0f,RightBumperCurrentPositionvector.y-1.0f,RightBumperCurrentPositionvector.z-1.0f,RightBumperCurrentPositionvector.w-1.0f);
+
+		RightBumper.originX = RightBumperCurrentPositionvector.x;
+		RightBumper.originZ = RightBumperCurrentPositionvector.z;
+		RightBumper.radius = 0.2f;	
 
 		std::cout<< "rightwall X: min"<<RightWall.minX<< " max "<< RightWall.maxX <<" min Z "<< RightWall.minZ <<" max  " <<RightWall.maxZ <<std::endl;
 		std::cout<< "rightwall Y: min"<<RightWall.minY<< " max "<< RightWall.minY<<std::endl;
@@ -732,6 +759,9 @@ class MyProject : public BaseProject {
 		Ball = intersectBallOrientedObstacle(Ball,BottomLeftWall);
 		Ball = intersectBallObjectPointByPoint(Ball,LeftFlipperPoints,LeftFlipperBottomLeftVector);
 		Ball = intersectBallObjectPointByPoint(Ball,RightFlipperPoints,RightFlipperBottomRightVector);
+		Ball = intersectBallObjectRotationalObject(Ball,LeftBumper);
+		Ball = intersectBallObjectRotationalObject(Ball,CentreBumper);
+		Ball = intersectBallObjectRotationalObject(Ball,RightBumper);
 		
 
 		
@@ -801,21 +831,24 @@ class MyProject : public BaseProject {
 		memcpy(data, &ubo, sizeof(ubo));
 		vkUnmapMemory(device, DSRightFlipper.uniformBuffersMemory[0][currentImage]);
 
-		ubo.model = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,0.2f,1.5f))*BodyPosition;
+		// Left Bumper
+		ubo.model = LeftBumperCurrentPosition;
 					
 		vkMapMemory(device, DSLeftBumper.uniformBuffersMemory[0][currentImage], 0,
 							sizeof(ubo), 0, &data);
 		memcpy(data, &ubo, sizeof(ubo));
 		vkUnmapMemory(device, DSLeftBumper.uniformBuffersMemory[0][currentImage]);
 
-		ubo.model = glm::translate(glm::mat4(1.0f),glm::vec3(-1.0f,0.2f,0.0f))*BodyPosition;
+		// Centre Bumper
+		ubo.model = CentreBumperCurrentPosition;
 					
 		vkMapMemory(device, DSCentreBumper.uniformBuffersMemory[0][currentImage], 0,
 							sizeof(ubo), 0, &data);
 		memcpy(data, &ubo, sizeof(ubo));
 		vkUnmapMemory(device, DSCentreBumper.uniformBuffersMemory[0][currentImage]);
 
-		ubo.model = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,0.2f,-1.5f))*BodyPosition;
+		// Right Bumper
+		ubo.model = RightBumperCurrentPosition;
 					
 		vkMapMemory(device, DSRightBumper.uniformBuffersMemory[0][currentImage], 0,
 							sizeof(ubo), 0, &data);
