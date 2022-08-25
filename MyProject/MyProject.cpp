@@ -44,6 +44,18 @@ class MyProject : public BaseProject {
 	Model RightFlipper;
 	Texture RightFlipperTexture;
 	DescriptorSet DSRightFlipper;
+
+	Model LeftBumper;
+	Texture LeftBumperTexture;
+	DescriptorSet DSLeftBumper;
+
+	Model CentreBumper;
+	Texture CentreBumperTexture;
+	DescriptorSet DSCentreBumper;
+
+	Model RightBumper;
+	Texture RightBumperTexture;
+	DescriptorSet DSRightBumper;
 	
 	// Here you set the main application parameters
 	void setWindowParameters() {
@@ -54,9 +66,9 @@ class MyProject : public BaseProject {
 		initialBackgroundColor = {1.0f, 1.0f, 1.0f, 1.0f};
 		
 		// Descriptor pool sizes
-		uniformBlocksInPool = 5;
-		texturesInPool = 5;
-		setsInPool = 5;
+		uniformBlocksInPool = 8;
+		texturesInPool = 8;
+		setsInPool = 8;
 	}
 	
 	// Here you load and setup all your Vulkan objects
@@ -129,7 +141,32 @@ class MyProject : public BaseProject {
 					{1, TEXTURE, 0, &RightFlipperTexture}
 				});
 
+		LeftBumper.init(this, "models/PinballDark/bumper1.obj");
+		LeftBumperTexture.init(this, "textures/StarWarsPinball.png");
+
+
+		DSLeftBumper.init(this, &DSL1, {
+					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+					{1, TEXTURE, 0, &LeftBumperTexture}
+				});
+
+		CentreBumper.init(this, "models/PinballDark/bumper2.obj");
+		CentreBumperTexture.init(this, "textures/StarWarsPinball.png");
+
+
+		DSCentreBumper.init(this, &DSL1, {
+					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+					{1, TEXTURE, 0, &CentreBumperTexture}
+				});
 		
+		RightBumper.init(this, "models/PinballDark/bumper3.obj");
+		RightBumperTexture.init(this, "textures/StarWarsPinball.png");
+
+
+		DSRightBumper.init(this, &DSL1, {
+					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+					{1, TEXTURE, 0, &RightBumperTexture}
+				});
 	}
 
 	// Here you destroy all the objects you created!		
@@ -154,6 +191,18 @@ class MyProject : public BaseProject {
 		DSRightFlipper.cleanup();
 		RightFlipperTexture.cleanup();
 		RightFlipper.cleanup();
+
+		DSLeftBumper.cleanup();
+		LeftBumperTexture.cleanup();
+		LeftBumper.cleanup();
+
+		DSCentreBumper.cleanup();
+		CentreBumperTexture.cleanup();
+		CentreBumper.cleanup();
+
+		DSRightBumper.cleanup();
+		RightBumperTexture.cleanup();
+		RightBumper.cleanup();
 
 
 		DSL1.cleanup();
@@ -247,6 +296,48 @@ class MyProject : public BaseProject {
 						
 		vkCmdDrawIndexed(commandBuffer,
 					static_cast<uint32_t>(RightFlipper.indices.size()), 1, 0, 0, 0);
+
+		VkBuffer vertexBuffersLeftBumper[] = {LeftBumper.vertexBuffer};
+		VkDeviceSize offsetsLeftBumper[] = {0};
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffersLeftBumper, offsetsLeftBumper);
+		vkCmdBindIndexBuffer(commandBuffer, LeftBumper.indexBuffer, 0,
+								VK_INDEX_TYPE_UINT32);
+
+		vkCmdBindDescriptorSets(commandBuffer,
+						VK_PIPELINE_BIND_POINT_GRAPHICS,
+						P1.pipelineLayout, 0, 1, &DSLeftBumper.descriptorSets[currentImage],
+						0, nullptr);
+						
+		vkCmdDrawIndexed(commandBuffer,
+					static_cast<uint32_t>(LeftBumper.indices.size()), 1, 0, 0, 0);
+
+		VkBuffer vertexBuffersCentreBumper[] = {CentreBumper.vertexBuffer};
+		VkDeviceSize offsetsCentreBumper[] = {0};
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffersCentreBumper, offsetsCentreBumper);
+		vkCmdBindIndexBuffer(commandBuffer, CentreBumper.indexBuffer, 0,
+								VK_INDEX_TYPE_UINT32);
+
+		vkCmdBindDescriptorSets(commandBuffer,
+						VK_PIPELINE_BIND_POINT_GRAPHICS,
+						P1.pipelineLayout, 0, 1, &DSCentreBumper.descriptorSets[currentImage],
+						0, nullptr);
+						
+		vkCmdDrawIndexed(commandBuffer,
+					static_cast<uint32_t>(CentreBumper.indices.size()), 1, 0, 0, 0);
+
+		VkBuffer vertexBuffersRightBumper[] = {RightBumper.vertexBuffer};
+		VkDeviceSize offsetsRightBumper[] = {0};
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffersRightBumper, offsetsRightBumper);
+		vkCmdBindIndexBuffer(commandBuffer, RightBumper.indexBuffer, 0,
+								VK_INDEX_TYPE_UINT32);
+
+		vkCmdBindDescriptorSets(commandBuffer,
+						VK_PIPELINE_BIND_POINT_GRAPHICS,
+						P1.pipelineLayout, 0, 1, &DSRightBumper.descriptorSets[currentImage],
+						0, nullptr);
+						
+		vkCmdDrawIndexed(commandBuffer,
+					static_cast<uint32_t>(RightBumper.indices.size()), 1, 0, 0, 0);
 
 
 					
@@ -709,6 +800,27 @@ class MyProject : public BaseProject {
 							sizeof(ubo), 0, &data);
 		memcpy(data, &ubo, sizeof(ubo));
 		vkUnmapMemory(device, DSRightFlipper.uniformBuffersMemory[0][currentImage]);
+
+		ubo.model = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,0.2f,1.5f))*BodyPosition;
+					
+		vkMapMemory(device, DSLeftBumper.uniformBuffersMemory[0][currentImage], 0,
+							sizeof(ubo), 0, &data);
+		memcpy(data, &ubo, sizeof(ubo));
+		vkUnmapMemory(device, DSLeftBumper.uniformBuffersMemory[0][currentImage]);
+
+		ubo.model = glm::translate(glm::mat4(1.0f),glm::vec3(-1.0f,0.2f,0.0f))*BodyPosition;
+					
+		vkMapMemory(device, DSCentreBumper.uniformBuffersMemory[0][currentImage], 0,
+							sizeof(ubo), 0, &data);
+		memcpy(data, &ubo, sizeof(ubo));
+		vkUnmapMemory(device, DSCentreBumper.uniformBuffersMemory[0][currentImage]);
+
+		ubo.model = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,0.2f,-1.5f))*BodyPosition;
+					
+		vkMapMemory(device, DSRightBumper.uniformBuffersMemory[0][currentImage], 0,
+							sizeof(ubo), 0, &data);
+		memcpy(data, &ubo, sizeof(ubo));
+		vkUnmapMemory(device, DSRightBumper.uniformBuffersMemory[0][currentImage]);
 	}	
 };
 
