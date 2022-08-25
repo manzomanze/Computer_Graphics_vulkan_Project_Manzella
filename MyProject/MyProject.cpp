@@ -63,7 +63,7 @@ class MyProject : public BaseProject {
 		windowWidth = 1600;
 		windowHeight = 900;
 		windowTitle = "My Project";
-		initialBackgroundColor = {1.0f, 1.0f, 1.0f, 1.0f};
+		initialBackgroundColor = {0.0f, 0.0f, 0.0f, 1.0f};
 		
 		// Descriptor pool sizes
 		uniformBlocksInPool = 8;
