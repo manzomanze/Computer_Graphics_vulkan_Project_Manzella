@@ -9,6 +9,11 @@ struct UniformBufferObject {
 	alignas(16) glm::mat4 model;
 	alignas(16) glm::mat4 view;
 	alignas(16) glm::mat4 proj;
+	alignas(16) glm::vec3 lightDir;
+	alignas(16) glm::vec3 lightPos;
+	alignas(16) glm::vec3 lightColor;
+	alignas(16) glm::vec3 eyePos;
+	alignas(16) glm::vec4 coneInOutDecayExp;
 };
 
 
@@ -823,6 +828,12 @@ class MyProject : public BaseProject {
 						swapChainExtent.width / (float) swapChainExtent.height,
 						0.1f, 100.0f);
 		ubo.proj[1][1] *= -1;
+
+		ubo.lightDir = glm::vec3(cos(glm::radians(0.0f)) * cos(glm::radians(0.0f)), sin(glm::radians(0.0f)) * cos(glm::radians(0.0f)), sin(glm::radians(90.0f)));
+		ubo.lightPos = glm::vec3(3.0f, 3.0f, 0.0f);
+		ubo.lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		ubo.eyePos = glm::vec3(5.0f+cameraX+valueX, 0.0f+cameraY+valueY, cameraZ+valueZ);
+		ubo.coneInOutDecayExp = glm::vec4(0.9f, 0.92f, 2.0f, 2.0f);
 		
 		void* data;
 

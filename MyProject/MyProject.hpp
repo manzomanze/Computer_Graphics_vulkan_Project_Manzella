@@ -628,6 +628,7 @@ class Flipper : public MovingObject2D{
 		float testPointZ = ball.originZ - glm::cos(i * angleIncrement)*ballRadius;
 
 		if(pointIsInside(testPointX,testPointZ)){
+			std::cout << "AAAAAAAAAAAAAAAAAAAa"<<std::endl;
 			float distanceFromFlipperFulcrum = calculateDistanceFromFlipperFulcrum(testPointX,testPointZ,FlipperCurrentPositionvector);
 
 			ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed-coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
