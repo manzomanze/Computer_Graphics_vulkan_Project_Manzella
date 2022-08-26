@@ -535,6 +535,11 @@ class Flipper : public MovingObject2D{
 			glm::vec4 FlipperTopLeftVector = mainTransformationMatrixinput*glm::vec4(topLeftXinput,0.0f,topLeftZinput,1.0f);
 			glm::vec4 FlipperTopRightVector = mainTransformationMatrixinput*glm::vec4(topRightXinput,0.0f,topRightZinput,1.0f);
 
+/* 			std::cout<<"FlipperBottomLeftVector (X,Z) (" <<FlipperBottomLeftVector.x<<","<<FlipperBottomLeftVector.z<<")"<<std::endl;
+			std::cout<<"FlipperBottomRightVector (X,Z) (" <<FlipperBottomRightVector.x<<","<<FlipperBottomRightVector.z<<")"<<std::endl;
+			std::cout<<"FlipperTopLeftVector(X,Z) (" <<FlipperTopLeftVector.x<<","<<FlipperTopLeftVector.z<<")"<<std::endl;
+			std::cout<<"FlipperTopRightVector(X,Z) (" <<FlipperTopRightVector.x<<","<<FlipperTopRightVector.z<<")"<<std::endl; */
+
 
 			this->setRotationAngle(rotationAngleinput);
 			
