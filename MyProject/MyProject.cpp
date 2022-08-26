@@ -414,8 +414,8 @@ class MyProject : public BaseProject {
 		static OrientableObjectDimensions LeftWall;
 		static OrientableObjectDimensions BottomRightWall;
 		static OrientableObjectDimensions BottomLeftWall; */
-		static ObjectPointByPoint LeftFlipperPoints;
-		static ObjectPointByPoint RightFlipperPoints;
+		/* static ObjectPointByPoint LeftFlipperPoints;
+		static ObjectPointByPoint RightFlipperPoints; */
 		static RotationalObjectDimensions LeftBumper;
 		static RotationalObjectDimensions CentreBumper;
 		static RotationalObjectDimensions RightBumper;
@@ -687,14 +687,14 @@ class MyProject : public BaseProject {
 		BottomLeftWall.orientationWithRespectToNegativeZaxis = -3.14/2; 
 	*/
 		float FlipperBottomLeftX = 0.174519f;
-		float FlipperBottomLeftZ = 0.167087f
+		float FlipperBottomLeftZ = 0.167087f;
 		float FlipperBottomRightX = 0.174519f;
-		float FlipperBottomRightZ = -0.167087f
+		float FlipperBottomRightZ = -0.167087f;
 		float FlipperTopLeftX = -0.919164f;
 		float FlipperTopLeftZ = 0.167087f;
 		float FlipperTopRightX = 0.092294;
 		float FlipperTopRightZ = -0.092294;
-		glm::vec4 LeftFlipperBottomLeftVector = LeftFlipperCurrentPosition*glm::vec4(0.174519f,0.0f,0.167087f,1.0f);
+/* 		glm::vec4 LeftFlipperBottomLeftVector = LeftFlipperCurrentPosition*glm::vec4(0.174519f,0.0f,0.167087f,1.0f);
 		glm::vec4 LeftFlipperBottomRightVector = LeftFlipperCurrentPosition*glm::vec4(0.174519f,0.0f,-0.167087f,1.0f);
 		glm::vec4 LeftFlipperTopLeftVector = LeftFlipperCurrentPosition*glm::vec4(-0.919164f,0.0f, 0.092294 ,1.0f);
 		glm::vec4 LeftFlipperTopRightVector = LeftFlipperCurrentPosition*glm::vec4(-0.919164f,0.0f,-0.092294,1.0f);
@@ -724,7 +724,7 @@ class MyProject : public BaseProject {
 		RightFlipperPoints.topLeftZ = RightFlipperTopLeftVector.z;
 		RightFlipperPoints.topRightX = RightFlipperTopRightVector.x;
 		RightFlipperPoints.topRightZ = RightFlipperTopRightVector.z;
-		RightFlipperPoints.orientationWithRespectToNegativeZaxis = glm::radians(rightFlipperRotate+120.0f);
+		RightFlipperPoints.orientationWithRespectToNegativeZaxis = glm::radians(rightFlipperRotate+120.0f); */
 
 
 		glm::mat4 LeftBumperCurrentPosition = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,0.2f,1.5f))*BodyPosition;
@@ -776,6 +776,8 @@ class MyProject : public BaseProject {
 		
 		
 		Flipper LeftFlipperTest(FlipperBottomLeftX, FlipperBottomLeftZ, FlipperBottomRightX, FlipperBottomRightZ, FlipperTopLeftX, FlipperTopLeftZ, FlipperTopRightX, FlipperTopRightZ, leftFlipperRotate-120.0f, "left-flipper, ",LeftFlipperCurrentPosition);
+
+		Flipper RightFlipperTest(FlipperBottomLeftX, FlipperBottomLeftZ, FlipperBottomRightX, FlipperBottomRightZ, FlipperTopLeftX, FlipperTopLeftZ, FlipperTopRightX, FlipperTopRightZ, leftFlipperRotate+120.0f, "left-flipper, ",RightFlipperCurrentPosition);
 		
 
 
@@ -789,9 +791,10 @@ class MyProject : public BaseProject {
 		Ball = intersectBallOrientedObstacle(Ball,BottomLeftWall); */
 		Ball = BottomRightWall.bounceBall(Ball);
 		Ball = BottomLeftWall.bounceBall(Ball);
-		Ball = LeftFlipperTest.bounceBall(Ball)
+		Ball = LeftFlipperTest.bounceBall(Ball);
+		Ball = RightFlipperTest.bounceBall(Ball);
 		/* Ball = intersectBallObjectPointByPoint(Ball,LeftFlipperPoints,LeftFlipperBottomLeftVector); */
-		Ball = intersectBallObjectPointByPoint(Ball,RightFlipperPoints,RightFlipperBottomRightVector);
+		/* Ball = intersectBallObjectPointByPoint(Ball,RightFlipperPoints,RightFlipperBottomRightVector); */
 		Ball = intersectBallObjectRotationalObject(Ball,LeftBumper);
 		Ball = intersectBallObjectRotationalObject(Ball,CentreBumper);
 		Ball = intersectBallObjectRotationalObject(Ball,RightBumper);
