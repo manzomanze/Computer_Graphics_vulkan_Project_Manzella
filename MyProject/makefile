@@ -18,6 +18,6 @@ clean:
 	rm -f Vulkan
 
 comp:
-	glslc ./shaders/BRDFShader.frag -o ./shaders/BRDFFrag.spv	
-	glslc ./shaders/BRDFShader.vert -o ./shaders/BRDFVert.spv	
+	glslc ./shaders/shader.frag -o ./shaders/frag.spv	
+	glslc ./shaders/shader.vert -o ./shaders/vert.spv	
 	./Vulkan
