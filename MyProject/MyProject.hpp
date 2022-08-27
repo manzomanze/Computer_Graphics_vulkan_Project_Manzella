@@ -365,10 +365,6 @@ class Bumper : public Object2D{
 	public:
 		Bumper(float radiusinput, std::string nameinput, float originXinput, float originZinput, glm::mat4 mainTransformationMatrixinput) : Object2D(nameinput, originXinput, originZinput, mainTransformationMatrixinput){
 
-			glm::mat4 BumperCurrentPosition = glm::translate(glm::mat4(1.0f),glm::vec3(originXinput,0.2f,originZinput))*mainTransformationMatrixinput;
-			glm::vec4 BumperCurrentPositionvector = BumperCurrentPosition*glm::vec4(1.0f,1.0f,1.0f,1.0f);
-			BumperCurrentPositionvector = glm::vec4(BumperCurrentPositionvector.x-1.0f,BumperCurrentPositionvector.y-1.0f,BumperCurrentPositionvector.z-1.0f,BumperCurrentPositionvector.w-1.0f);
-
 			radius = radiusinput;
 		}
 
