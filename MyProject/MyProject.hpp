@@ -496,26 +496,14 @@ class Wall : public MovingObject2D{
 			std::string nameinput,  glm::mat4 mainTransformationMatrixinput) 
 				: MovingObject2D(0.0f,0.0f, nameinput, 0.0f,0.0f, mainTransformationMatrixinput){     // Constructor
 
-			glm::vec4 WallminXPositionVector = mainTransformationMatrixinput*glm::vec4(minXinput,0.0f,0.0f,1.0f);
-			glm::vec4 WallmaxXPositionVector = mainTransformationMatrixinput*glm::vec4(maxXinput,0.0f,0.0f,1.0f);
-
-			glm::vec4 WallminYPositionVector = mainTransformationMatrixinput*glm::vec4(0.0f,minYinput,0.0f,1.0f);
-			glm::vec4 WallmaxYPositionVector = mainTransformationMatrixinput*glm::vec4(0.0f,maxYinput,0.0f,1.0f);
-
-			std::cout<<maxXinput<<std::endl;
-			std::cout<<WallmaxXPositionVector.y<<std::endl;
-
-			glm::vec4 WallminZPositionVector = mainTransformationMatrixinput*glm::vec4(0.0f,0.0f,minZinput,1.0f);
-			glm::vec4 WallmaxZPositionVector = mainTransformationMatrixinput*glm::vec4(0.0f,0.0f,maxZinput,1.0f);
-
 			this->setRotationAngle(rotationAngleinput);
 			
-			minX = WallminXPositionVector.x;
-			maxX = WallmaxXPositionVector.x;
-			minY = WallminYPositionVector.y;
-			maxY = WallmaxYPositionVector.y;
-			minZ = WallminZPositionVector.z;
-			maxZ = WallmaxZPositionVector.z;
+			minX = minXinput;
+			maxX = maxXinput;
+			minY = minYinput;
+			maxY = maxYinput;
+			minZ = minZinput;
+			maxZ = maxZinput;
 		}
 
 		MovingRotationalObjectDimensions bounceBall (MovingRotationalObjectDimensions ball);
@@ -525,6 +513,12 @@ class Wall : public MovingObject2D{
 		float getmaxY();
 		float getminZ();
 		float getmaxZ();
+		float getTransformedminX();
+		float getTransformedmaxX();
+		float getTransformedminY();
+		float getTransformedmaxY();
+		float getTransformedminZ();
+		float getTransformedmaxZ();
 		
 }; 
 // methods of Wall class
@@ -550,6 +544,34 @@ class Wall : public MovingObject2D{
 		return maxZ;
 	}
 
+	float Wall::getTransformedminX(){
+		glm::vec4 WallminXPositionVector = this->getTransformationMatrix()*glm::vec4(this->getminX(),0.0f,0.0f,1.0f);
+		return WallminXPositionVector.x;
+	}
+	float Wall::getTransformedmaxX(){
+		glm::vec4 WallmaxXPositionVector = this->getTransformationMatrix()*glm::vec4(this->getmaxX(),0.0f,0.0f,1.0f);
+		return WallmaxXPositionVector.x;
+	}
+	float Wall::getTransformedminY(){
+		
+		glm::vec4 WallminYPositionVector = this->getTransformationMatrix()*glm::vec4(0.0f,this->getminY(),0.0f,1.0f);
+		return WallminYPositionVector.y;
+	}
+
+	float Wall::getTransformedmaxY(){
+		glm::vec4 WallmaxYPositionVector = this->getTransformationMatrix()*glm::vec4(0.0f,this->getmaxY(),0.0f,1.0f);
+		return WallmaxYPositionVector.y;
+	}
+	float Wall::getTransformedminZ(){
+		glm::vec4 WallminZPositionVector = this->getTransformationMatrix()*glm::vec4(0.0f,0.0f,this->getminZ(),1.0f);
+		return WallminZPositionVector.z;
+	}
+
+	float Wall::getTransformedmaxZ(){
+		glm::vec4 WallmaxZPositionVector = this->getTransformationMatrix()*glm::vec4(0.0f,0.0f,this->getmaxZ(),1.0f);
+		return WallmaxZPositionVector.z;
+	}
+
 	MovingRotationalObjectDimensions Wall::bounceBall (MovingRotationalObjectDimensions ball){
 		float angleResolution = 8;
 		float angleIncrement = 360.0f / angleResolution;
@@ -570,8 +592,8 @@ class Wall : public MovingObject2D{
 			std::cout<< "rightwall Y: min"<<this->getminY()<< " max "<< this->getminY()<<std::endl; */
 	
 		for(int i = 0; i<angleResolution;i++){
-			if((ball.originX - glm::sin(i * angleIncrement)*ballRadius <= this->getmaxX() && ball.originX - glm::sin(i * angleIncrement)*ballRadius >= this->getminX()) &&
-				(ball.originZ - glm::cos(i * angleIncrement)*ballRadius <= this->getmaxZ() && ball.originZ - glm::cos(i * angleIncrement)*ballRadius >= this->getminZ()) /* && 
+			if((ball.originX - glm::sin(i * angleIncrement)*ballRadius <= this->getTransformedmaxX() && ball.originX - glm::sin(i * angleIncrement)*ballRadius >= this->getTransformedminX()) &&
+				(ball.originZ - glm::cos(i * angleIncrement)*ballRadius <= this->getTransformedmaxZ() && ball.originZ - glm::cos(i * angleIncrement)*ballRadius >= this->getTransformedminZ()) /* && 
 				(ball.originY  <= this->getmaxY() && ball.originY  >= this->getminY()) */){
 					ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed;
 					ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed;
