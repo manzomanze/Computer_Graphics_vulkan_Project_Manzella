@@ -42,6 +42,7 @@ const float sideWallDepth = 0.30f;
 const float effectOfCollisionOnSpeed = 1.0;
 const float flipperRotateSpeed = 200.0f;
 const float coeffiecientOfFlipperBallSpeed = 0.007f;
+const float BumperAccelerateBallSpeed = 1.07f;
 
 // Lesson 22.0
 const std::vector<const char*> validationLayers = {
@@ -354,6 +355,60 @@ class Object2D {
 		return mainTransformationMatrix;
 	}
 
+class Bumper : public Object2D{
+	private: 
+		float radius;
+	public:
+		Bumper(float radiusinput, std::string nameinput, float originXinput, float originZinput, glm::mat4 mainTransformationMatrixinput) : Object2D(nameinput, originXinput, originZinput, mainTransformationMatrixinput){
+
+			glm::mat4 BumperCurrentPosition = glm::translate(glm::mat4(1.0f),glm::vec3(originXinput,0.2f,originZinput))*mainTransformationMatrixinput;
+			glm::vec4 BumperCurrentPositionvector = BumperCurrentPosition*glm::vec4(1.0f,1.0f,1.0f,1.0f);
+			BumperCurrentPositionvector = glm::vec4(BumperCurrentPositionvector.x-1.0f,BumperCurrentPositionvector.y-1.0f,BumperCurrentPositionvector.z-1.0f,BumperCurrentPositionvector.w-1.0f);
+
+			this->setOriginX(BumperCurrentPositionvector.x);
+			this->setOriginZ(BumperCurrentPositionvector.z);
+
+			radius = radiusinput;
+		}
+
+		float getRadius();
+
+		MovingRotationalObjectDimensions bounceBall (MovingRotationalObjectDimensions ball);	
+};
+	float Bumper::getRadius(){
+		return radius;
+	}
+
+	MovingRotationalObjectDimensions Bumper::bounceBall (MovingRotationalObjectDimensions ball){
+		float angleResolution = 8;
+		float angleIncrement = 360.0f / angleResolution;
+			
+		// This should give us the angle of the ball movement with respect to  natural axis with Z new to the right and Xnew ging away from the User
+		float ballMovementAngle = atan2(-ball.speedX,-ball.speedZ);
+		/* std::cout<<ballMovementAngle<<std::endl; */
+
+		
+
+		//collision calculation using vectors
+		glm::vec2 ballSpeed = glm::vec2(-ball.speedZ,-ball.speedX);
+		glm::vec2 normal = glm::vec2(-glm::cos(atan2(ball.originX-this->getOriginX(),ball.originZ-this->getOriginZ())),-glm::sin(atan2(ball.originX-this->getOriginX(),ball.originZ-this->getOriginZ())));
+		glm::vec2 u = (glm::dot(ballSpeed,normal)/glm::dot(normal,normal))*normal;
+		glm::vec2 W = ballSpeed - u;
+		glm::vec2 newBallSpeed = W - u;
+		//std::cout<< "speed NEWWW X:"<<newBallSpeed.x<< " Z "<< newBallSpeed.y<<std::endl;
+
+		for(int i = 0; i<angleResolution;i++){
+			float testPointX = ball.originX - glm::sin(i * angleIncrement)*ballRadius;
+			float testPointZ = ball.originZ - glm::cos(i * angleIncrement)*ballRadius;
+
+			if(sqrt(pow(ball.originX-this->getOriginX(),2)+pow(ball.originZ-this->getOriginZ(),2)) < this->getRadius()+ballRadius){
+				ball.speedX = -newBallSpeed.y*BumperAccelerateBallSpeed;
+				ball.speedZ = -newBallSpeed.x*BumperAccelerateBallSpeed;
+				return ball; 
+			}
+		}  
+		return ball; 
+	}
 
 class MovingObject2D : public Object2D{       
 	private:
@@ -368,7 +423,7 @@ class MovingObject2D : public Object2D{
 
 	public: 
 
-		MovingObject2D(std::string nameinput, float originXinput, float originZinput, glm::mat4 mainTransformationMatrixinput, float speedXinput, float speedZinput) : Object2D(nameinput, originXinput, originZinput, mainTransformationMatrixinput){     // Constructor
+		MovingObject2D(float speedXinput, float speedZinput, std::string nameinput, float originXinput, float originZinput, glm::mat4 mainTransformationMatrixinput) : Object2D(nameinput, originXinput, originZinput, mainTransformationMatrixinput){     // Constructor
 
 			speedX = speedXinput;
 			speedZ = speedZinput;
@@ -418,7 +473,7 @@ class Wall : public MovingObject2D{
 
 		Wall(float minXinput, float maxXinput, float minYinput, float maxYinput, float minZinput, float maxZinput, float rotationAngleinput, 
 			std::string nameinput,  glm::mat4 mainTransformationMatrixinput) 
-				: MovingObject2D(nameinput, 0.0f,0.0f, mainTransformationMatrixinput, 0.0f,0.0f){     // Constructor
+				: MovingObject2D(0.0f,0.0f, nameinput, 0.0f,0.0f, mainTransformationMatrixinput){     // Constructor
 
 			glm::vec4 WallminXPositionVector = mainTransformationMatrixinput*glm::vec4(minXinput,0.0f,0.0f,1.0f);
 			glm::vec4 WallmaxXPositionVector = mainTransformationMatrixinput*glm::vec4(maxXinput,0.0f,0.0f,1.0f);
@@ -525,7 +580,7 @@ class Flipper : public MovingObject2D{
 
 		Flipper(float bottomLeftXinput, float bottomLeftZinput, float bottomRightXinput, float bottomRightZinput, float topLeftXinput, float topLeftZinput, float topRightXinput, float topRightZinput, float rotationAngleinput, 
 			std::string nameinput,  glm::mat4 mainTransformationMatrixinput) 
-				: MovingObject2D(nameinput, 0.0f,0.0f, mainTransformationMatrixinput, 0.0f,0.0f){     // Constructor
+				: MovingObject2D(0.0f,0.0f,nameinput, 0.0f,0.0f, mainTransformationMatrixinput){     // Constructor
 
 			FlipperCurrentPositionvector = mainTransformationMatrixinput*glm::vec4(1.0f,1.0f,1.0f,1.0f);
 			FlipperCurrentPositionvector = glm::vec4(FlipperCurrentPositionvector.x-1.0f,FlipperCurrentPositionvector.y-1.0f,FlipperCurrentPositionvector.z-1.0f,FlipperCurrentPositionvector.w-1.0f);

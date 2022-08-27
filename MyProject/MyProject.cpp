@@ -817,6 +817,11 @@ class MyProject : public BaseProject {
 		Flipper RightFlipperTest(FlipperBottomLeftX, FlipperBottomLeftZ, FlipperBottomRightX, FlipperBottomRightZ, FlipperTopLeftX, FlipperTopLeftZ, FlipperTopRightX, FlipperTopRightZ, leftFlipperRotate+120.0f, "left-flipper, ",RightFlipperCurrentPosition);
 		
 
+		Bumper LeftBumperTest(/* radius input */0.2f, "left-bumper", 0.0f, 1.5f, BodyPosition);
+
+		Bumper CentreBumperTest(/* radius input */0.2f, "centre-bumper", -1.0f, 0.0f, BodyPosition);
+
+		Bumper RightBumperTest(/* radius input */0.2f, "right-bumper", 0.0f, -1.5f, BodyPosition);
 
 		/* Ball = intersectBallOrientedObstacle(Ball,RightWall); */
 		Ball = RightWall.bounceBall(Ball);
@@ -832,9 +837,12 @@ class MyProject : public BaseProject {
 		Ball = RightFlipperTest.bounceBall(Ball);
 		/* Ball = intersectBallObjectPointByPoint(Ball,LeftFlipperPoints,LeftFlipperBottomLeftVector); */
 		/* Ball = intersectBallObjectPointByPoint(Ball,RightFlipperPoints,RightFlipperBottomRightVector); */
-		Ball = intersectBallObjectRotationalObject(Ball,LeftBumper);
-		Ball = intersectBallObjectRotationalObject(Ball,CentreBumper);
-		Ball = intersectBallObjectRotationalObject(Ball,RightBumper);
+		Ball = LeftBumperTest.bounceBall(Ball);
+		Ball = CentreBumperTest.bounceBall(Ball);
+		Ball = RightBumperTest.bounceBall(Ball);
+		/* Ball = intersectBallObjectRotationalObject(Ball,LeftBumper); */
+		/* Ball = intersectBallObjectRotationalObject(Ball,CentreBumper);
+		Ball = intersectBallObjectRotationalObject(Ball,RightBumper); */
 		
 
 		
