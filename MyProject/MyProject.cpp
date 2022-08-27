@@ -408,7 +408,6 @@ class MyProject : public BaseProject {
 		static float cameraYaw = 0.0f;
 		static float cameraRotationSpeed = 10.0f;
 		
-
 		static float valueX = 0.0f;
 		static float valueY = 0.0f;
 		static float valueZ = 0.0f;
@@ -420,13 +419,6 @@ class MyProject : public BaseProject {
 		static float springSpeed = 10.0f;
 		static float launchBallSpeed = 0.0f;
 		
-		
-		
-		static float ballX = 0.0f;
-		static float ballY = 0.0f;
-		static float ballZ = 0.0f;
-
-
 		static float rightZMargin = -2.47737f;
 		static float leftZMargin = 2.54627f;
 		static float topXMargin = -5.45043f;
@@ -445,36 +437,21 @@ class MyProject : public BaseProject {
 		float FlipperTopRightX = -0.919164f;
 		float FlipperTopRightZ = -0.092294f;
 
-		
 
+		static float ballX = 0.0f;
+		static float ballY = 0.0f;
+		static float ballZ = 0.0f;
 		static float ballXstart = 3.5f;
 		static float ballZstart = -2.0f;
 		
 		//definition of physics interacting objects
 
 		static MovingRotationalObjectDimensions Ball;
-		/* static OrientableObjectDimensions TopWall;
-		static OrientableObjectDimensions RightWall;
-		static OrientableObjectDimensions LeftWall;
-		static OrientableObjectDimensions BottomRightWall;
-		static OrientableObjectDimensions BottomLeftWall; */
-		/* static ObjectPointByPoint LeftFlipperPoints;
-		static ObjectPointByPoint RightFlipperPoints; */
-		static RotationalObjectDimensions LeftBumper;
-		static RotationalObjectDimensions CentreBumper;
-		static RotationalObjectDimensions RightBumper;
-/* 		LeftFlipperPoints.name = "left flipper";
-		RightWall.name = "right wall";
- */
 
 		static float leftFlipperRotate = 0.0f;
 		static float rightFlipperRotate = 0.0f;
 		static float gravityconstant = 1.0f;
 		static float activeGravity = 0.0f;
-
-
-		static OrientableObjectDimensions LeftFlipper;
-		static OrientableObjectDimensions RightFlipper;
 		
 		static auto previousReleaseValueOfSpace = GLFW_RELEASE;
 
@@ -597,18 +574,16 @@ class MyProject : public BaseProject {
 		
 		if(glfwGetKey(window,GLFW_KEY_I)){
 				ballX = ballX-2.0f*deltaT;
-			}
-			if(glfwGetKey(window,GLFW_KEY_K)){
-				ballX = ballX+2.0f*deltaT;
-			}
-
-
-			if(glfwGetKey(window,GLFW_KEY_J)){
-				ballZ = ballZ+2.0f*deltaT;
-			}
-			if(glfwGetKey(window,GLFW_KEY_L)){
-				ballZ = ballZ-2.0f*deltaT;
-			}
+		}
+		if(glfwGetKey(window,GLFW_KEY_K)){
+			ballX = ballX+2.0f*deltaT;
+		}
+		if(glfwGetKey(window,GLFW_KEY_J)){
+			ballZ = ballZ+2.0f*deltaT;
+		}
+		if(glfwGetKey(window,GLFW_KEY_L)){
+			ballZ = ballZ-2.0f*deltaT;
+		}
 
 		 
 
@@ -641,152 +616,8 @@ class MyProject : public BaseProject {
 		BodyPositionVector = glm::vec4(BodyPositionVector.x-1.0f,BodyPositionVector.y-1.0f,BodyPositionVector.z-1.0f,BodyPositionVector.w-1.0f);
 
 
-		glm::mat4 RightFlipperCurrentPosition = glm::translate(glm::mat4(1.0f),glm::vec3(bottomXMargin-0.7f, ballRadius, rightFlipperMargin))*
-												glm::rotate(glm::mat4(1.0f),
-												glm::radians(120.0f),
-												glm::vec3(0.0f, 1.0f, 0.0f))*
-												glm::rotate(glm::mat4(1.0f),
-												glm::radians(rightFlipperRotate),
-												glm::vec3(0.0f, 1.0f, 0.0f))*
-												BodyPosition;
-
-		glm::mat4 LeftFlipperCurrentPosition = 	glm::translate(glm::mat4(1.0f),glm::vec3(bottomXMargin-0.7f, ballRadius, leftFlipperMargin))*
-												glm::rotate(glm::mat4(1.0f),
-												glm::radians(-120.0f),
-												glm::vec3(0.0f, 1.0f, 0.0f))*
-												glm::rotate(glm::mat4(1.0f),
-												glm::radians(leftFlipperRotate),
-												glm::vec3(0.0f, 1.0f, 0.0f))*
-												BodyPosition;
 
 
-
-	/* 		glm::vec4 AnyWallminYPositionVector = BodyPosition*glm::vec4(0.0f,bottomYMargin,0.0f,1.0f);
-		glm::vec4 AnyWallmaxYPositionVector = BodyPosition*glm::vec4(0.0f,topYMargin,0.0f,1.0f);
-
-		glm::vec4 TopWallminXPositionVector = BodyPosition*glm::vec4(topXMargin-sideWallDepth,0.0f,0.0f,1.0f);
-		glm::vec4 TopWallmaxXPositionVector = BodyPosition*glm::vec4(topXMargin,0.0f,0.0f,1.0f);
-		glm::vec4 TopWallminZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,rightZMargin,1.0f);
-		glm::vec4 TopWallmaxZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,leftZMargin,1.0f);
-
-		TopWall.minX = TopWallminXPositionVector.x;
-		TopWall.maxX = TopWallmaxXPositionVector.x;
-		TopWall.minY = AnyWallminYPositionVector.y;
-		TopWall.maxY = AnyWallmaxYPositionVector.y;
-		TopWall.minZ = TopWallminZPositionVector.z;
-		TopWall.maxZ = TopWallmaxZPositionVector.z;
-		TopWall.orientationWithRespectToNegativeZaxis = 3.14/2;
-
-		glm::vec4 RightWallminXPositionVector = BodyPosition*glm::vec4(topXMargin,0.0f,0.0f,1.0f);
-		glm::vec4 RightWallmaxXPositionVector = BodyPosition*glm::vec4(bottomXMargin,0.0f,0.0f,1.0f);
-		glm::vec4 RightWallminZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,rightZMargin-sideWallDepth,1.0f);
-		glm::vec4 RightWallmaxZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,rightZMargin,1.0f);
-
-
-		RightWall.minX = RightWallminXPositionVector.x;
-		RightWall.maxX = RightWallmaxXPositionVector.x;
-		RightWall.minY = AnyWallminYPositionVector.y;
-		RightWall.maxY = AnyWallmaxYPositionVector.y;
-		RightWall.minZ = RightWallminZPositionVector.z;
-		RightWall.maxZ = RightWallmaxZPositionVector.z;
-		RightWall.orientationWithRespectToNegativeZaxis = 0.0f;
-
-		glm::vec4 LeftWallminXPositionVector = BodyPosition*glm::vec4(topXMargin,0.0f,0.0f,1.0f);
-		glm::vec4 LeftWallmaxXPositionVector = BodyPosition*glm::vec4(bottomXMargin,0.0f,0.0f,1.0f);
-		glm::vec4 LeftWallminZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,leftZMargin,1.0f);
-		glm::vec4 LeftWallmaxZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,leftZMargin+sideWallDepth,1.0f);
-
-		LeftWall.minX = LeftWallminXPositionVector.x;
-		LeftWall.maxX = LeftWallmaxXPositionVector.x;
-		LeftWall.minY = AnyWallminYPositionVector.y;
-		LeftWall.maxY = AnyWallmaxYPositionVector.y;
-		LeftWall.minZ = LeftWallminZPositionVector.z;
-		LeftWall.maxZ = LeftWallmaxZPositionVector.z;
-		LeftWall.orientationWithRespectToNegativeZaxis = 0.0f;
-
-		glm::vec4 BottomRightWallminXPositionVector = BodyPosition*glm::vec4(bottomXMargin,0.0f,0.0f,1.0f);
-		glm::vec4 BottomRightWallmaxXPositionVector = BodyPosition*glm::vec4(bottomXMargin+sideWallDepth,0.0f,0.0f,1.0f);
-		glm::vec4 BottomRightWallminZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,rightZMargin,1.0f);
-		glm::vec4 BottomRightWallmaxZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,rightFlipperMargin,1.0f);
-
-		BottomRightWall.minX = BottomRightWallminXPositionVector.x;
-		BottomRightWall.maxX = BottomRightWallmaxXPositionVector.x;
-		BottomRightWall.minY = AnyWallminYPositionVector.y;
-		BottomRightWall.maxY = AnyWallmaxYPositionVector.y;
-		BottomRightWall.minZ = BottomRightWallminZPositionVector.z;
-		BottomRightWall.maxZ = BottomRightWallmaxZPositionVector.z;
-		BottomRightWall.orientationWithRespectToNegativeZaxis = -3.14/2;
-
-		glm::vec4 BottomLeftWallminXPositionVector = BodyPosition*glm::vec4(bottomXMargin,0.0f,0.0f,1.0f);
-		glm::vec4 BottomLeftWallmaxXPositionVector = BodyPosition*glm::vec4(bottomXMargin+sideWallDepth,0.0f,0.0f,1.0f);
-		glm::vec4 BottomLeftWallminZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,leftFlipperMargin,1.0f);
-		glm::vec4 BottomLeftWallmaxZPositionVector = BodyPosition*glm::vec4(0.0f,0.0f,leftZMargin,1.0f);
-
-		BottomLeftWall.minX = BottomLeftWallminXPositionVector.x;
-		BottomLeftWall.maxX = BottomLeftWallmaxXPositionVector.x;
-		BottomLeftWall.minY = AnyWallminYPositionVector.y;
-		BottomLeftWall.maxY = AnyWallmaxYPositionVector.y;
-		BottomLeftWall.minZ = BottomLeftWallminZPositionVector.z;
-		BottomLeftWall.maxZ = BottomLeftWallmaxZPositionVector.z;
-		BottomLeftWall.orientationWithRespectToNegativeZaxis = -3.14/2; 
-	*/
-
-/* 		glm::vec4 LeftFlipperBottomLeftVector = LeftFlipperCurrentPosition*glm::vec4(0.174519f,0.0f,0.167087f,1.0f);
-		glm::vec4 LeftFlipperBottomRightVector = LeftFlipperCurrentPosition*glm::vec4(0.174519f,0.0f,-0.167087f,1.0f);
-		glm::vec4 LeftFlipperTopLeftVector = LeftFlipperCurrentPosition*glm::vec4(-0.919164f,0.0f, 0.092294 ,1.0f);
-		glm::vec4 LeftFlipperTopRightVector = LeftFlipperCurrentPosition*glm::vec4(-0.919164f,0.0f,-0.092294,1.0f);
-
-
-		LeftFlipperPoints.bottomLeftX = LeftFlipperBottomLeftVector.x;
-		LeftFlipperPoints.bottomLeftZ = LeftFlipperBottomLeftVector.z;
-		LeftFlipperPoints.bottomRightX = LeftFlipperBottomRightVector.x;
-		LeftFlipperPoints.bottomRightZ = LeftFlipperBottomRightVector.z;
-		LeftFlipperPoints.topLeftX = LeftFlipperTopLeftVector.x;
-		LeftFlipperPoints.topLeftZ = LeftFlipperTopLeftVector.z;
-		LeftFlipperPoints.topRightX = LeftFlipperTopRightVector.x;
-		LeftFlipperPoints.topRightZ = LeftFlipperTopRightVector.z;
-		LeftFlipperPoints.orientationWithRespectToNegativeZaxis = glm::radians(leftFlipperRotate-120.0f);
-
-		glm::vec4 RightFlipperBottomLeftVector = RightFlipperCurrentPosition*glm::vec4(0.174519f,0.0f,0.167087f,1.0f);
-		glm::vec4 RightFlipperBottomRightVector = RightFlipperCurrentPosition*glm::vec4(0.174519f,0.0f,-0.167087f,1.0f);
-		glm::vec4 RightFlipperTopLeftVector = RightFlipperCurrentPosition*glm::vec4(-0.919164f,0.0f, 0.092294 ,1.0f);
-		glm::vec4 RightFlipperTopRightVector = RightFlipperCurrentPosition*glm::vec4(-0.919164f,0.0f,-0.092294,1.0f);
-
-
-		RightFlipperPoints.bottomLeftX = RightFlipperBottomLeftVector.x;
-		RightFlipperPoints.bottomLeftZ = RightFlipperBottomLeftVector.z;
-		RightFlipperPoints.bottomRightX = RightFlipperBottomRightVector.x;
-		RightFlipperPoints.bottomRightZ = RightFlipperBottomRightVector.z;
-		RightFlipperPoints.topLeftX = RightFlipperTopLeftVector.x;
-		RightFlipperPoints.topLeftZ = RightFlipperTopLeftVector.z;
-		RightFlipperPoints.topRightX = RightFlipperTopRightVector.x;
-		RightFlipperPoints.topRightZ = RightFlipperTopRightVector.z;
-		RightFlipperPoints.orientationWithRespectToNegativeZaxis = glm::radians(rightFlipperRotate+120.0f); */
-
-
-		glm::mat4 LeftBumperCurrentPosition = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,0.2f,1.5f))*BodyPosition;
-		glm::vec4 LeftBumperCurrentPositionvector = LeftBumperCurrentPosition*glm::vec4(1.0f,1.0f,1.0f,1.0f);
-		LeftBumperCurrentPositionvector = glm::vec4(LeftBumperCurrentPositionvector.x-1.0f,LeftBumperCurrentPositionvector.y-1.0f,LeftBumperCurrentPositionvector.z-1.0f,LeftBumperCurrentPositionvector.w-1.0f);
-
-		LeftBumper.originX = LeftBumperCurrentPositionvector.x;
-		LeftBumper.originZ = LeftBumperCurrentPositionvector.z;
-		LeftBumper.radius = 0.2f;	
-
-		glm::mat4 CentreBumperCurrentPosition = glm::translate(glm::mat4(1.0f),glm::vec3(-1.0f,0.2f,0.0f))*BodyPosition;
-		glm::vec4 CentreBumperCurrentPositionvector = CentreBumperCurrentPosition*glm::vec4(1.0f,1.0f,1.0f,1.0f);
-		CentreBumperCurrentPositionvector = glm::vec4(CentreBumperCurrentPositionvector.x-1.0f,CentreBumperCurrentPositionvector.y-1.0f,CentreBumperCurrentPositionvector.z-1.0f,CentreBumperCurrentPositionvector.w-1.0f);
-
-		CentreBumper.originX = CentreBumperCurrentPositionvector.x;
-		CentreBumper.originZ = CentreBumperCurrentPositionvector.z;
-		CentreBumper.radius = 0.2f;		
-
-		glm::mat4 RightBumperCurrentPosition = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,0.2f,-1.5f))*BodyPosition;
-		glm::vec4 RightBumperCurrentPositionvector = RightBumperCurrentPosition*glm::vec4(1.0f,1.0f,1.0f,1.0f);
-		RightBumperCurrentPositionvector = glm::vec4(RightBumperCurrentPositionvector.x-1.0f,RightBumperCurrentPositionvector.y-1.0f,RightBumperCurrentPositionvector.z-1.0f,RightBumperCurrentPositionvector.w-1.0f);
-
-		RightBumper.originX = RightBumperCurrentPositionvector.x;
-		RightBumper.originZ = RightBumperCurrentPositionvector.z;
-		RightBumper.radius = 0.2f;	
 
 		/* std::cout<< "rightwall X: min"<<RightWall.minX<< " max "<< RightWall.maxX <<" min Z "<< RightWall.minZ <<" max  " <<RightWall.maxZ <<std::endl;
 		std::cout<< "rightwall Y: min"<<RightWall.minY<< " max "<< RightWall.minY<<std::endl; */
@@ -810,6 +641,24 @@ class MyProject : public BaseProject {
 
 		Wall BottomLeftWall(bottomXMargin, bottomXMargin+sideWallDepth, bottomYMargin, topYMargin, leftFlipperMargin, leftZMargin, -3.14/2, 
 			"bottom-right-wall", BodyPosition);
+
+		glm::mat4 RightFlipperCurrentPosition = glm::translate(glm::mat4(1.0f),glm::vec3(bottomXMargin-0.7f, ballRadius, rightFlipperMargin))*
+												glm::rotate(glm::mat4(1.0f),
+												glm::radians(120.0f),
+												glm::vec3(0.0f, 1.0f, 0.0f))*
+												glm::rotate(glm::mat4(1.0f),
+												glm::radians(rightFlipperRotate),
+												glm::vec3(0.0f, 1.0f, 0.0f))*
+												BodyPosition;
+
+		glm::mat4 LeftFlipperCurrentPosition = 	glm::translate(glm::mat4(1.0f),glm::vec3(bottomXMargin-0.7f, ballRadius, leftFlipperMargin))*
+												glm::rotate(glm::mat4(1.0f),
+												glm::radians(-120.0f),
+												glm::vec3(0.0f, 1.0f, 0.0f))*
+												glm::rotate(glm::mat4(1.0f),
+												glm::radians(leftFlipperRotate),
+												glm::vec3(0.0f, 1.0f, 0.0f))*
+												BodyPosition;
 		
 		
 		Flipper LeftFlipperTest(FlipperBottomLeftX, FlipperBottomLeftZ, FlipperBottomRightX, FlipperBottomRightZ, FlipperTopLeftX, FlipperTopLeftZ, FlipperTopRightX, FlipperTopRightZ, leftFlipperRotate-120.0f, "left-flipper, ",LeftFlipperCurrentPosition);
@@ -823,26 +672,18 @@ class MyProject : public BaseProject {
 
 		Bumper RightBumperTest(/* radius input */0.2f, "right-bumper", 0.0f, -1.5f, BodyPosition);
 
-		/* Ball = intersectBallOrientedObstacle(Ball,RightWall); */
+
 		Ball = RightWall.bounceBall(Ball);
 		Ball = TopWall.bounceBall(Ball);
 		Ball = LeftWall.bounceBall(Ball);
-		/* Ball = intersectBallOrientedObstacle(Ball,LeftWall); */
-		/* Ball = intersectBallOrientedObstacle(Ball,TopWall); */
-		/* Ball = intersectBallOrientedObstacle(Ball,BottomRightWall);
-		Ball = intersectBallOrientedObstacle(Ball,BottomLeftWall); */
 		Ball = BottomRightWall.bounceBall(Ball);
 		Ball = BottomLeftWall.bounceBall(Ball);
 		Ball = LeftFlipperTest.bounceBall(Ball);
 		Ball = RightFlipperTest.bounceBall(Ball);
-		/* Ball = intersectBallObjectPointByPoint(Ball,LeftFlipperPoints,LeftFlipperBottomLeftVector); */
-		/* Ball = intersectBallObjectPointByPoint(Ball,RightFlipperPoints,RightFlipperBottomRightVector); */
 		Ball = LeftBumperTest.bounceBall(Ball);
 		Ball = CentreBumperTest.bounceBall(Ball);
 		Ball = RightBumperTest.bounceBall(Ball);
-		/* Ball = intersectBallObjectRotationalObject(Ball,LeftBumper); */
-		/* Ball = intersectBallObjectRotationalObject(Ball,CentreBumper);
-		Ball = intersectBallObjectRotationalObject(Ball,RightBumper); */
+
 		
 
 		
