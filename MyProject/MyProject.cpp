@@ -436,6 +436,15 @@ class MyProject : public BaseProject {
 		static float leftFlipperMargin = 1.0f;
 		static float rightFlipperMargin = -1.2f;
 
+		float FlipperBottomLeftX = 0.174519f;
+		float FlipperBottomLeftZ = 0.167087f;
+		float FlipperBottomRightX = 0.174519f;
+		float FlipperBottomRightZ = -0.167087f;
+		float FlipperTopLeftX = -0.919164f;
+		float FlipperTopLeftZ = 0.092294f;
+		float FlipperTopRightX = -0.919164f;
+		float FlipperTopRightZ = -0.092294f;
+
 		
 
 		static float ballXstart = 3.5f;
@@ -601,7 +610,7 @@ class MyProject : public BaseProject {
 				ballZ = ballZ-2.0f*deltaT;
 			}
 
-	
+		 
 
 		
 		Ball.speedY = 0.0f;
@@ -721,14 +730,7 @@ class MyProject : public BaseProject {
 		BottomLeftWall.maxZ = BottomLeftWallmaxZPositionVector.z;
 		BottomLeftWall.orientationWithRespectToNegativeZaxis = -3.14/2; 
 	*/
-		float FlipperBottomLeftX = 0.174519f;
-		float FlipperBottomLeftZ = 0.167087f;
-		float FlipperBottomRightX = 0.174519f;
-		float FlipperBottomRightZ = -0.167087f;
-		float FlipperTopLeftX = -0.919164f;
-		float FlipperTopLeftZ = 0.092294f;
-		float FlipperTopRightX = -0.919164f;
-		float FlipperTopRightZ = -0.092294f;
+
 /* 		glm::vec4 LeftFlipperBottomLeftVector = LeftFlipperCurrentPosition*glm::vec4(0.174519f,0.0f,0.167087f,1.0f);
 		glm::vec4 LeftFlipperBottomRightVector = LeftFlipperCurrentPosition*glm::vec4(0.174519f,0.0f,-0.167087f,1.0f);
 		glm::vec4 LeftFlipperTopLeftVector = LeftFlipperCurrentPosition*glm::vec4(-0.919164f,0.0f, 0.092294 ,1.0f);

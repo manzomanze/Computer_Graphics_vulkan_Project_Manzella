@@ -329,30 +329,30 @@ class Object2D {
 		
 };
 
-void Object2D::setOriginX(float originXinput){
-	originX = originXinput;
-}
-void Object2D::setOriginZ(float originZinput){
-	originZ = originZinput;
-}
+	void Object2D::setOriginX(float originXinput){
+		originX = originXinput;
+	}
+	void Object2D::setOriginZ(float originZinput){
+		originZ = originZinput;
+	}
 
-void Object2D::setName(std::string nameinput){
-	name = nameinput;
-} 
+	void Object2D::setName(std::string nameinput){
+		name = nameinput;
+	} 
 
-float Object2D::getOriginX(){
-	return originX;
-}
-float Object2D::getOriginZ(){
-	return originZ;
-}
-std::string Object2D::getName(){
-	return name;
-} 
+	float Object2D::getOriginX(){
+		return originX;
+	}
+	float Object2D::getOriginZ(){
+		return originZ;
+	}
+	std::string Object2D::getName(){
+		return name;
+	} 
 
-glm::mat4 Object2D::getTransformationMatrix(){
-	return mainTransformationMatrix;
-}
+	glm::mat4 Object2D::getTransformationMatrix(){
+		return mainTransformationMatrix;
+	}
 
 
 class MovingObject2D : public Object2D{       
@@ -454,7 +454,7 @@ class Wall : public MovingObject2D{
 // methods of Wall class
 
 	float Wall::getminX(){
-	return minX;
+		return minX;
 	}
 	float Wall::getmaxX(){
 		return maxX;
@@ -535,7 +535,7 @@ class Flipper : public MovingObject2D{
 			glm::vec4 FlipperTopLeftVector = mainTransformationMatrixinput*glm::vec4(topLeftXinput,0.0f,topLeftZinput,1.0f);
 			glm::vec4 FlipperTopRightVector = mainTransformationMatrixinput*glm::vec4(topRightXinput,0.0f,topRightZinput,1.0f);
 
-/* 			std::cout<<"FlipperBottomLeftVector (X,Z) (" <<FlipperBottomLeftVector.x<<","<<FlipperBottomLeftVector.z<<")"<<std::endl;
+		/* 	std::cout<<"FlipperBottomLeftVector (X,Z) (" <<FlipperBottomLeftVector.x<<","<<FlipperBottomLeftVector.z<<")"<<std::endl;
 			std::cout<<"FlipperBottomRightVector (X,Z) (" <<FlipperBottomRightVector.x<<","<<FlipperBottomRightVector.z<<")"<<std::endl;
 			std::cout<<"FlipperTopLeftVector(X,Z) (" <<FlipperTopLeftVector.x<<","<<FlipperTopLeftVector.z<<")"<<std::endl;
 			std::cout<<"FlipperTopRightVector(X,Z) (" <<FlipperTopRightVector.x<<","<<FlipperTopRightVector.z<<")"<<std::endl; */
@@ -574,7 +574,7 @@ class Flipper : public MovingObject2D{
 
 
 	float Flipper::getbottomLeftX(){
-	return bottomLeftX;
+		return bottomLeftX;
 	}
 	float Flipper::getbottomLeftZ(){
 		return bottomLeftZ;
@@ -603,77 +603,75 @@ class Flipper : public MovingObject2D{
 	}
 
 	MovingRotationalObjectDimensions Flipper::bounceBall(MovingRotationalObjectDimensions ball) {
-	float angleResolution = 8;
-	float angleIncrement = 360.0f / angleResolution;
+		float angleResolution = 8;
+		float angleIncrement = 360.0f / angleResolution;
+			
+		// This should give us the angle of the ball movement with respect to  natural axis with Z new to the right and Xnew ging away from the User
+		float ballMovementAngle = atan2(-ball.speedX,-ball.speedZ);
+		/* std::cout<<ballMovementAngle<<std::endl; */
+
 		
-	// This should give us the angle of the ball movement with respect to  natural axis with Z new to the right and Xnew ging away from the User
-	float ballMovementAngle = atan2(-ball.speedX,-ball.speedZ);
-	/* std::cout<<ballMovementAngle<<std::endl; */
 
+		//collision calculation using vectors
+		glm::vec2 ballSpeed = glm::vec2(-ball.speedZ,-ball.speedX);
+		glm::vec2 normal = glm::vec2(-glm::cos(this->getRotationAngle()),-glm::sin(this->getRotationAngle()));
+		glm::vec2 u = (glm::dot(ballSpeed,normal)/glm::dot(normal,normal))*normal;
+		glm::vec2 W = ballSpeed - u;
+		glm::vec2 newBallSpeed = W - u;
+		//std::cout<< "speed NEWWW X:"<<newBallSpeed.x<< " Z "<< newBallSpeed.y<<std::endl;
 	
-
-	//collision calculation using vectors
-	glm::vec2 ballSpeed = glm::vec2(-ball.speedZ,-ball.speedX);
-	glm::vec2 normal = glm::vec2(-glm::cos(this->getRotationAngle()),-glm::sin(this->getRotationAngle()));
-	glm::vec2 u = (glm::dot(ballSpeed,normal)/glm::dot(normal,normal))*normal;
-	glm::vec2 W = ballSpeed - u;
-	glm::vec2 newBallSpeed = W - u;
-	//std::cout<< "speed NEWWW X:"<<newBallSpeed.x<< " Z "<< newBallSpeed.y<<std::endl;
-  
-	
+		
 
 
-	for(int i = 0; i<angleResolution;i++){
-		float testPointX = ball.originX - glm::sin(i * angleIncrement)*ballRadius;
-		float testPointZ = ball.originZ - glm::cos(i * angleIncrement)*ballRadius;
+		for(int i = 0; i<angleResolution;i++){
+			float testPointX = ball.originX - glm::sin(i * angleIncrement)*ballRadius;
+			float testPointZ = ball.originZ - glm::cos(i * angleIncrement)*ballRadius;
 
-		if(pointIsInside(testPointX,testPointZ)){
-			std::cout << "AAAAAAAAAAAAAAAAAAAa"<<std::endl;
-			float distanceFromFlipperFulcrum = calculateDistanceFromFlipperFulcrum(testPointX,testPointZ,FlipperCurrentPositionvector);
+			if(pointIsInside(testPointX,testPointZ)){
+				float distanceFromFlipperFulcrum = calculateDistanceFromFlipperFulcrum(testPointX,testPointZ,FlipperCurrentPositionvector);
 
-			ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed-coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
-			ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed-coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
-			return ball; 
-		}
-	
-	}  
+				ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed-coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
+				ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed-coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
+				return ball; 
+			}
+		
+		}  
 
-  	return ball; 
+		return ball; 
 	  
-}
+	}
 
 
 
-bool Flipper::pointIsleftToTheVector(float testPointX, float testPointY, float prismPoint1X, float prismPoint1Y, float prismPoint2X,float prismPoint2Y)
-{
-	return ((prismPoint2X - prismPoint1X)*(testPointY - prismPoint1Y) - (prismPoint2Y - prismPoint1Y)*(testPointX - prismPoint1X)) > 0;
-		float A = -(prismPoint2Y-prismPoint1Y);
-		float B = (prismPoint2X-prismPoint1X);
-		float C = -A*prismPoint1X+B*prismPoint1Y;
-		std::cout<<A*testPointX+B*testPointY+C<<" ";
-		if(A*testPointX+B*testPointY+C>0.0f) return true;
+	bool Flipper::pointIsleftToTheVector(float testPointX, float testPointY, float prismPoint1X, float prismPoint1Y, float prismPoint2X,float prismPoint2Y){
+		return ((prismPoint2X - prismPoint1X)*(testPointY - prismPoint1Y) - (prismPoint2Y - prismPoint1Y)*(testPointX - prismPoint1X)) > 0;
+			float A = -(prismPoint2Y-prismPoint1Y);
+			float B = (prismPoint2X-prismPoint1X);
+			float C = -A*prismPoint1X+B*prismPoint1Y;
+			std::cout<<A*testPointX+B*testPointY+C<<" ";
+			if(A*testPointX+B*testPointY+C>0.0f) return true;
+			return false;
+	}
+
+	bool Flipper::pointIsInside(float testPointX, float testPointZ){
+		
+
+		bool firstEdge = pointIsleftToTheVector(testPointX,testPointZ,this->getbottomRightX(),this->getbottomRightZ(),this->getbottomLeftX(),this->getbottomLeftZ());
+		bool secondEdge = pointIsleftToTheVector(testPointX,testPointZ,this->gettopRightX(),this->gettopRightZ(),this->getbottomRightX(),this->getbottomRightZ());
+		bool thirdEdge = pointIsleftToTheVector(testPointX,testPointZ,this->gettopLeftX(),this->gettopLeftZ(),this->gettopRightX(),this->gettopRightZ());
+		bool fourthEdge = pointIsleftToTheVector(testPointX,testPointZ,this->getbottomLeftX(),this->getbottomLeftZ(),this->gettopLeftX(),this->gettopLeftZ());
+		/* std::cout<<std::endl;
+
+		std::cout<<firstEdge<<secondEdge<<thirdEdge<<fourthEdge<<std::endl; */
+		if(firstEdge && secondEdge && thirdEdge && fourthEdge){return true;}
 		return false;
-}
+	}
 
-bool Flipper::pointIsInside(float testPointX, float testPointZ){
-	
+	float Flipper::calculateDistanceFromFlipperFulcrum(float testPointX, float testPointZ, glm::vec4 FlipperFulcrum){
 
-	bool firstEdge = pointIsleftToTheVector(testPointX,testPointZ,this->getbottomRightX(),this->getbottomRightZ(),this->getbottomLeftX(),this->getbottomLeftZ());
-	bool secondEdge = pointIsleftToTheVector(testPointX,testPointZ,this->gettopRightX(),this->gettopRightZ(),this->getbottomRightX(),this->getbottomRightZ());
-	bool thirdEdge = pointIsleftToTheVector(testPointX,testPointZ,this->gettopLeftX(),this->gettopLeftZ(),this->gettopRightX(),this->gettopRightZ());
-	bool fourthEdge = pointIsleftToTheVector(testPointX,testPointZ,this->getbottomLeftX(),this->getbottomLeftZ(),this->gettopLeftX(),this->gettopLeftZ());
-	/* std::cout<<std::endl;
+		return sqrt(pow(testPointX-FlipperFulcrum.x, 2)+pow(testPointZ-FlipperFulcrum.z, 2));
 
-	std::cout<<firstEdge<<secondEdge<<thirdEdge<<fourthEdge<<std::endl; */
-	if(firstEdge && secondEdge && thirdEdge && fourthEdge){return true;}
-	return false;
-}
-
-float Flipper::calculateDistanceFromFlipperFulcrum(float testPointX, float testPointZ, glm::vec4 FlipperFulcrum){
-
-	return sqrt(pow(testPointX-FlipperFulcrum.x, 2)+pow(testPointZ-FlipperFulcrum.z, 2));
-
-}
+	}
 
 //// For debugging - Lesson 22.0
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
