@@ -304,12 +304,14 @@ class Object2D {
 	private:             
 		std::string name;        
 		float originX;
+		float originY;
 		float originZ;
 		glm::mat4 mainTransformationMatrix; 
 
 	protected: 
 
 		void setOriginX(float originXinput);
+		void setOriginY(float originYinput);
 		void setOriginZ(float originZinput);
 		void setName(std::string nameinput);
 	
@@ -323,6 +325,7 @@ class Object2D {
 		}
 
 		float getOriginX();
+		float getOriginY();
 		float getOriginZ();
 		float getTransformedOriginX();
 		float getTransformedOriginZ();
@@ -337,6 +340,9 @@ class Object2D {
 	void Object2D::setOriginX(float originXinput){
 		originX = originXinput;
 	}
+	void Object2D::setOriginY(float originXinput){
+		originX = originXinput;
+	}
 	void Object2D::setOriginZ(float originZinput){
 		originZ = originZinput;
 	}
@@ -347,6 +353,9 @@ class Object2D {
 
 	float Object2D::getOriginX(){
 		return originX;
+	}
+	float Object2D::getOriginY(){
+		return originY;
 	}
 	float Object2D::getOriginZ(){
 		return originZ;
@@ -615,40 +624,25 @@ class Flipper : public MovingObject2D{
 		float topLeftZ;
 		float topRightX;
 		float topRightZ;
-		glm::vec4 FlipperCurrentPositionvector;
+
 		
 
 	public: 
 	
 
 		Flipper(float bottomLeftXinput, float bottomLeftZinput, float bottomRightXinput, float bottomRightZinput, float topLeftXinput, float topLeftZinput, float topRightXinput, float topRightZinput, float rotationAngleinput, 
-			std::string nameinput,  glm::mat4 mainTransformationMatrixinput) 
-				: MovingObject2D(0.0f,0.0f,nameinput, 0.0f,0.0f, mainTransformationMatrixinput){     // Constructor
-
-			FlipperCurrentPositionvector = mainTransformationMatrixinput*glm::vec4(1.0f,1.0f,1.0f,1.0f);
-			FlipperCurrentPositionvector = glm::vec4(FlipperCurrentPositionvector.x-1.0f,FlipperCurrentPositionvector.y-1.0f,FlipperCurrentPositionvector.z-1.0f,FlipperCurrentPositionvector.w-1.0f);
-
-			glm::vec4 FlipperBottomLeftVector = mainTransformationMatrixinput*glm::vec4(bottomLeftXinput,0.0f,bottomLeftZinput,1.0f);
-			glm::vec4 FlipperBottomRightVector = mainTransformationMatrixinput*glm::vec4(bottomRightXinput,0.0f,bottomRightZinput,1.0f);
-			glm::vec4 FlipperTopLeftVector = mainTransformationMatrixinput*glm::vec4(topLeftXinput,0.0f,topLeftZinput,1.0f);
-			glm::vec4 FlipperTopRightVector = mainTransformationMatrixinput*glm::vec4(topRightXinput,0.0f,topRightZinput,1.0f);
-
-		/* 	std::cout<<"FlipperBottomLeftVector (X,Z) (" <<FlipperBottomLeftVector.x<<","<<FlipperBottomLeftVector.z<<")"<<std::endl;
-			std::cout<<"FlipperBottomRightVector (X,Z) (" <<FlipperBottomRightVector.x<<","<<FlipperBottomRightVector.z<<")"<<std::endl;
-			std::cout<<"FlipperTopLeftVector(X,Z) (" <<FlipperTopLeftVector.x<<","<<FlipperTopLeftVector.z<<")"<<std::endl;
-			std::cout<<"FlipperTopRightVector(X,Z) (" <<FlipperTopRightVector.x<<","<<FlipperTopRightVector.z<<")"<<std::endl; */
-
+			std::string nameinput, float originXinput, float originYinput, float originZinput, glm::mat4 mainTransformationMatrixinput) 
+				: MovingObject2D(0.0f,0.0f,nameinput, originXinput,originZinput, mainTransformationMatrixinput){     // Constructor
 
 			this->setRotationAngle(rotationAngleinput);
-			
-			bottomLeftX = FlipperBottomLeftVector.x;
-			bottomLeftZ = FlipperBottomLeftVector.z;
-			bottomRightX = FlipperBottomRightVector.x;
-			bottomRightZ = FlipperBottomRightVector.z;
-			topLeftX = FlipperTopLeftVector.x;
-			topLeftZ = FlipperTopLeftVector.z;
-			topRightX = FlipperTopRightVector.x;
-			topRightZ = FlipperTopRightVector.z;
+			bottomLeftX = bottomLeftXinput;
+			bottomLeftZ = bottomLeftZinput;
+			bottomRightX = bottomRightXinput;
+			bottomRightZ = bottomRightZinput;
+			topLeftX = topLeftXinput;
+			topLeftZ = topLeftZinput;
+			topRightX = topRightXinput;
+			topRightZ = topRightZinput;
 		}
 
 		MovingRotationalObjectDimensions bounceBall (MovingRotationalObjectDimensions ball);
@@ -662,6 +656,16 @@ class Flipper : public MovingObject2D{
 		float gettopLeftZ();
 		float gettopRightX();
 		float gettopRightZ();
+		float getTransformedbottomLeftX();
+		float getTransformedbottomLeftZ();
+		float getTransformedbottomRightX();
+		float getTransformedbottomRightZ();
+		float getTransformedtopLeftX();
+		float getTransformedtopLeftZ();
+		float getTransformedtopRightX();
+		float getTransformedtopRightZ();
+		glm::mat4 getResultingTransformationMatrix();
+		glm::vec4 getResultingTransformationVector();
 		bool pointIsleftToTheVector(float testPointX, float testPointY, float prismPoint1X, float prismPoint1Y, float prismPoint2X,float prismPoint2Y);
 		bool pointIsInside(float testPointX, float testPointZ);
 		float calculateDistanceFromFlipperFulcrum(float testPointX, float testPointZ, glm::vec4 FlipperFulcrum);
@@ -700,6 +704,58 @@ class Flipper : public MovingObject2D{
 		return topRightZ;
 	}
 
+	float Flipper::getTransformedbottomLeftX(){
+		glm::vec4 FlipperBottomLeftVector = this->getResultingTransformationMatrix()*glm::vec4(this->getbottomLeftX(),0.0f,this->getbottomLeftZ(),1.0f);
+		return FlipperBottomLeftVector.x;
+	}
+	float Flipper::getTransformedbottomLeftZ(){
+		glm::vec4 FlipperBottomLeftVector = this->getResultingTransformationMatrix()*glm::vec4(this->getbottomLeftX(),0.0f,this->getbottomLeftZ(),1.0f);
+		return FlipperBottomLeftVector.z;
+	}
+	float Flipper::getTransformedbottomRightX(){
+		glm::vec4 FlipperBottomRightVector = this->getResultingTransformationMatrix()*glm::vec4(this->getbottomRightX(),0.0f,this->getbottomRightZ(),1.0f);
+		return FlipperBottomRightVector.x;
+	}
+
+	float Flipper::getTransformedbottomRightZ(){
+		glm::vec4 FlipperBottomRightVector = this->getResultingTransformationMatrix()*glm::vec4(this->getbottomRightX(),0.0f,this->getbottomRightZ(),1.0f);
+		return FlipperBottomRightVector.z;
+	}
+	float Flipper::getTransformedtopLeftX(){
+		glm::vec4 FlipperTopLeftVector = this->getResultingTransformationMatrix()*glm::vec4(this->gettopLeftX(),0.0f,this->gettopLeftZ(),1.0f);
+		return FlipperTopLeftVector.x;
+	}
+
+	float Flipper::getTransformedtopLeftZ(){
+		glm::vec4 FlipperTopLeftVector = this->getResultingTransformationMatrix()*glm::vec4(this->gettopLeftX(),0.0f,this->gettopLeftZ(),1.0f);
+		return FlipperTopLeftVector.z;
+	}
+
+	float Flipper::getTransformedtopRightX(){
+		glm::vec4 FlipperTopRightVector = this->getResultingTransformationMatrix()*glm::vec4(this->gettopRightX(),0.0f,this->gettopRightZ(),1.0f);
+		return FlipperTopRightVector.x;
+	}
+
+	float Flipper::getTransformedtopRightZ(){
+		glm::vec4 FlipperTopRightVector = this->getResultingTransformationMatrix()*glm::vec4(this->gettopRightX(),0.0f,this->gettopRightZ(),1.0f);
+		return FlipperTopRightVector.z;
+	}
+
+	glm::mat4 Flipper::getResultingTransformationMatrix(){
+		return glm::translate(glm::mat4(1.0f),glm::vec3(this->getOriginX(), ballRadius, this->getOriginZ())) * glm::rotate(glm::mat4(1.0f),
+							glm::radians(this->getRotationAngle()),
+							glm::vec3(0.0f, 1.0f, 0.0f))*
+							this->getTransformationMatrix();
+
+	}
+
+	glm::vec4 Flipper::getResultingTransformationVector(){
+		glm::vec4 FlipperCurrentPositionvector = this->getResultingTransformationMatrix()*glm::vec4(1.0f,1.0f,1.0f,1.0f);
+			FlipperCurrentPositionvector = glm::vec4(FlipperCurrentPositionvector.x-1.0f,FlipperCurrentPositionvector.y-1.0f,FlipperCurrentPositionvector.z-1.0f,FlipperCurrentPositionvector.w-1.0f);
+		return FlipperCurrentPositionvector;
+	}
+
+
 	MovingRotationalObjectDimensions Flipper::bounceBall(MovingRotationalObjectDimensions ball) {
 		float angleResolution = 8;
 		float angleIncrement = 360.0f / angleResolution;
@@ -726,7 +782,7 @@ class Flipper : public MovingObject2D{
 			float testPointZ = ball.originZ - glm::cos(i * angleIncrement)*ballRadius;
 
 			if(pointIsInside(testPointX,testPointZ)){
-				float distanceFromFlipperFulcrum = calculateDistanceFromFlipperFulcrum(testPointX,testPointZ,FlipperCurrentPositionvector);
+				float distanceFromFlipperFulcrum = calculateDistanceFromFlipperFulcrum(testPointX,testPointZ,this->getResultingTransformationVector());
 
 				ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed-coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
 				ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed-coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
@@ -754,10 +810,10 @@ class Flipper : public MovingObject2D{
 	bool Flipper::pointIsInside(float testPointX, float testPointZ){
 		
 
-		bool firstEdge = pointIsleftToTheVector(testPointX,testPointZ,this->getbottomRightX(),this->getbottomRightZ(),this->getbottomLeftX(),this->getbottomLeftZ());
-		bool secondEdge = pointIsleftToTheVector(testPointX,testPointZ,this->gettopRightX(),this->gettopRightZ(),this->getbottomRightX(),this->getbottomRightZ());
-		bool thirdEdge = pointIsleftToTheVector(testPointX,testPointZ,this->gettopLeftX(),this->gettopLeftZ(),this->gettopRightX(),this->gettopRightZ());
-		bool fourthEdge = pointIsleftToTheVector(testPointX,testPointZ,this->getbottomLeftX(),this->getbottomLeftZ(),this->gettopLeftX(),this->gettopLeftZ());
+		bool firstEdge = pointIsleftToTheVector(testPointX,testPointZ,this->getTransformedbottomRightX(),this->getTransformedbottomRightZ(),this->getTransformedbottomLeftX(),this->getTransformedbottomLeftZ());
+		bool secondEdge = pointIsleftToTheVector(testPointX,testPointZ,this->getTransformedtopRightX(),this->getTransformedtopRightZ(),this->getTransformedbottomRightX(),this->getTransformedbottomRightZ());
+		bool thirdEdge = pointIsleftToTheVector(testPointX,testPointZ,this->getTransformedtopLeftX(),this->getTransformedtopLeftZ(),this->getTransformedtopRightX(),this->getTransformedtopRightZ());
+		bool fourthEdge = pointIsleftToTheVector(testPointX,testPointZ,this->getTransformedbottomLeftX(),this->getTransformedbottomLeftZ(),this->getTransformedtopLeftX(),this->getTransformedtopLeftZ());
 		/* std::cout<<std::endl;
 
 		std::cout<<firstEdge<<secondEdge<<thirdEdge<<fourthEdge<<std::endl; */

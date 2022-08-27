@@ -599,7 +599,7 @@ class MyProject : public BaseProject {
 
 		// Positions of the objects when they are models
 
-		glm::mat4 PullerCurrentPosition = glm::translate(glm::mat4(1.0f),glm::vec3(ballXstart+1.9f+pullerDistanceCovered, ballRadius, ballZstart))*BodyPosition;
+		glm::mat4 PullerCurrentPosition = glm::translate(glm::mat4(1.0f),glm::vec3(ballXstart+2.5f+pullerDistanceCovered, ballRadius, ballZstart))*BodyPosition;
 
 		glm::vec3 BallReady = glm::vec3(ballXstart+ballRadius, ballRadius, ballZstart);
 		glm::mat4 BallCurrentPosition = glm::translate(glm::mat4(1.0f),glm::vec3(BallReady.x+ballX, BallReady.y+ballY, BallReady.z+ballZ))*BodyPosition;
@@ -614,10 +614,6 @@ class MyProject : public BaseProject {
 		glm::vec4 BodyPositionVector = BodyPosition*glm::vec4(1.0f,1.0f,1.0f,1.0f);
 		//std::cout<< "result X:"<<result.x<< " Y "<< result.y<<" Z "<< result.z<<std::endl;
 		BodyPositionVector = glm::vec4(BodyPositionVector.x-1.0f,BodyPositionVector.y-1.0f,BodyPositionVector.z-1.0f,BodyPositionVector.w-1.0f);
-
-
-
-
 
 		/* std::cout<< "rightwall X: min"<<RightWall.minX<< " max "<< RightWall.maxX <<" min Z "<< RightWall.minZ <<" max  " <<RightWall.maxZ <<std::endl;
 		std::cout<< "rightwall Y: min"<<RightWall.minY<< " max "<< RightWall.minY<<std::endl; */
@@ -641,29 +637,10 @@ class MyProject : public BaseProject {
 
 		Wall BottomLeftWall(bottomXMargin, bottomXMargin+sideWallDepth, bottomYMargin, topYMargin, leftFlipperMargin, leftZMargin, -3.14/2, 
 			"bottom-right-wall", BodyPosition);
+				
+		Flipper LeftFlipperTest(FlipperBottomLeftX, FlipperBottomLeftZ, FlipperBottomRightX, FlipperBottomRightZ, FlipperTopLeftX, FlipperTopLeftZ, FlipperTopRightX, FlipperTopRightZ, leftFlipperRotate-120.0f, "left-flipper",bottomXMargin-0.7f, ballRadius,leftFlipperMargin,BodyPosition);
 
-		glm::mat4 RightFlipperCurrentPosition = glm::translate(glm::mat4(1.0f),glm::vec3(bottomXMargin-0.7f, ballRadius, rightFlipperMargin))*
-												glm::rotate(glm::mat4(1.0f),
-												glm::radians(120.0f),
-												glm::vec3(0.0f, 1.0f, 0.0f))*
-												glm::rotate(glm::mat4(1.0f),
-												glm::radians(rightFlipperRotate),
-												glm::vec3(0.0f, 1.0f, 0.0f))*
-												BodyPosition;
-
-		glm::mat4 LeftFlipperCurrentPosition = 	glm::translate(glm::mat4(1.0f),glm::vec3(bottomXMargin-0.7f, ballRadius, leftFlipperMargin))*
-												glm::rotate(glm::mat4(1.0f),
-												glm::radians(-120.0f),
-												glm::vec3(0.0f, 1.0f, 0.0f))*
-												glm::rotate(glm::mat4(1.0f),
-												glm::radians(leftFlipperRotate),
-												glm::vec3(0.0f, 1.0f, 0.0f))*
-												BodyPosition;
-		
-		
-		Flipper LeftFlipperTest(FlipperBottomLeftX, FlipperBottomLeftZ, FlipperBottomRightX, FlipperBottomRightZ, FlipperTopLeftX, FlipperTopLeftZ, FlipperTopRightX, FlipperTopRightZ, leftFlipperRotate-120.0f, "left-flipper, ",LeftFlipperCurrentPosition);
-
-		Flipper RightFlipperTest(FlipperBottomLeftX, FlipperBottomLeftZ, FlipperBottomRightX, FlipperBottomRightZ, FlipperTopLeftX, FlipperTopLeftZ, FlipperTopRightX, FlipperTopRightZ, leftFlipperRotate+120.0f, "left-flipper, ",RightFlipperCurrentPosition);
+		Flipper RightFlipperTest(FlipperBottomLeftX, FlipperBottomLeftZ, FlipperBottomRightX, FlipperBottomRightZ, FlipperTopLeftX, FlipperTopLeftZ, FlipperTopRightX, FlipperTopRightZ, rightFlipperRotate+120.0f, "left-flipper",bottomXMargin-0.7f, ballRadius,rightFlipperMargin, BodyPosition);
 		
 
 		Bumper LeftBumperTest(/* radius input */0.2f, "left-bumper", 0.0f, 1.5f, BodyPosition);
@@ -747,16 +724,16 @@ class MyProject : public BaseProject {
 		memcpy(data, &ubo, sizeof(ubo));
 		vkUnmapMemory(device, DSBall.uniformBuffersMemory[0][currentImage]);
 
-		//Ball Position
-		ubo.model = LeftFlipperCurrentPosition;
+		//Left Flipper Position
+		ubo.model = LeftFlipperTest.getResultingTransformationMatrix();
 					
 		vkMapMemory(device, DSLeftFlipper.uniformBuffersMemory[0][currentImage], 0,
 							sizeof(ubo), 0, &data);
 		memcpy(data, &ubo, sizeof(ubo));
 		vkUnmapMemory(device, DSLeftFlipper.uniformBuffersMemory[0][currentImage]);
 
-		//Ball Position
-		ubo.model = RightFlipperCurrentPosition;
+		//Right Flipper Position
+		ubo.model = RightFlipperTest.getResultingTransformationMatrix();
 					
 		vkMapMemory(device, DSRightFlipper.uniformBuffersMemory[0][currentImage], 0,
 							sizeof(ubo), 0, &data);
