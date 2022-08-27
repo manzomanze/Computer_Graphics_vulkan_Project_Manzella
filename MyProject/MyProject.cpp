@@ -764,7 +764,7 @@ class MyProject : public BaseProject {
 		vkUnmapMemory(device, DSRightFlipper.uniformBuffersMemory[0][currentImage]);
 
 		// Left Bumper
-		ubo.model = LeftBumperCurrentPosition;
+		ubo.model = LeftBumperTest.getResultingTransformationMatrix();
 					
 		vkMapMemory(device, DSLeftBumper.uniformBuffersMemory[0][currentImage], 0,
 							sizeof(ubo), 0, &data);
@@ -772,7 +772,7 @@ class MyProject : public BaseProject {
 		vkUnmapMemory(device, DSLeftBumper.uniformBuffersMemory[0][currentImage]);
 
 		// Centre Bumper
-		ubo.model = CentreBumperCurrentPosition;
+		ubo.model = CentreBumperTest.getResultingTransformationMatrix();
 					
 		vkMapMemory(device, DSCentreBumper.uniformBuffersMemory[0][currentImage], 0,
 							sizeof(ubo), 0, &data);
@@ -780,7 +780,7 @@ class MyProject : public BaseProject {
 		vkUnmapMemory(device, DSCentreBumper.uniformBuffersMemory[0][currentImage]);
 
 		// Right Bumper
-		ubo.model = RightBumperCurrentPosition;
+		ubo.model = RightBumperTest.getResultingTransformationMatrix();
 					
 		vkMapMemory(device, DSRightBumper.uniformBuffersMemory[0][currentImage], 0,
 							sizeof(ubo), 0, &data);

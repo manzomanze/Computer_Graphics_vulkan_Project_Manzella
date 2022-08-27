@@ -324,8 +324,12 @@ class Object2D {
 
 		float getOriginX();
 		float getOriginZ();
+		float getTransformedOriginX();
+		float getTransformedOriginZ();
 		std::string getName();
 		glm::mat4 getTransformationMatrix();
+		glm::mat4 getResultingTransformationMatrix();
+		glm::vec4 getResultingTransformationVector();
 
 		
 };
@@ -365,18 +369,39 @@ class Bumper : public Object2D{
 			glm::vec4 BumperCurrentPositionvector = BumperCurrentPosition*glm::vec4(1.0f,1.0f,1.0f,1.0f);
 			BumperCurrentPositionvector = glm::vec4(BumperCurrentPositionvector.x-1.0f,BumperCurrentPositionvector.y-1.0f,BumperCurrentPositionvector.z-1.0f,BumperCurrentPositionvector.w-1.0f);
 
-			this->setOriginX(BumperCurrentPositionvector.x);
-			this->setOriginZ(BumperCurrentPositionvector.z);
-
 			radius = radiusinput;
 		}
 
 		float getRadius();
+		glm::mat4 getResultingTransformationMatrix();
+		glm::vec4 getResultingTransformationVector();
+		float getTransformedOriginX();
+		float getTransformedOriginZ();
 
 		MovingRotationalObjectDimensions bounceBall (MovingRotationalObjectDimensions ball);	
 };
 	float Bumper::getRadius(){
 		return radius;
+	}
+
+	glm::mat4 Bumper::getResultingTransformationMatrix(){
+		return glm::translate(glm::mat4(1.0f),glm::vec3(this->getOriginX(),0.2f,this->getOriginZ()))*this->getTransformationMatrix();
+	}
+
+	glm::vec4 Bumper::getResultingTransformationVector(){
+		glm::mat4 BumperCurrentPosition = getResultingTransformationMatrix();
+		glm::vec4 BumperCurrentPositionvector = BumperCurrentPosition*glm::vec4(1.0f,1.0f,1.0f,1.0f);
+		BumperCurrentPositionvector = glm::vec4(BumperCurrentPositionvector.x-1.0f,BumperCurrentPositionvector.y-1.0f,BumperCurrentPositionvector.z-1.0f,BumperCurrentPositionvector.w-1.0f);
+		return BumperCurrentPositionvector; 
+	}
+
+	float Bumper::getTransformedOriginX(){
+		
+		return this->getResultingTransformationVector().x;
+	}
+
+	float Bumper::getTransformedOriginZ(){
+		return this->getResultingTransformationVector().z;
 	}
 
 	MovingRotationalObjectDimensions Bumper::bounceBall (MovingRotationalObjectDimensions ball){
@@ -391,7 +416,7 @@ class Bumper : public Object2D{
 
 		//collision calculation using vectors
 		glm::vec2 ballSpeed = glm::vec2(-ball.speedZ,-ball.speedX);
-		glm::vec2 normal = glm::vec2(-glm::cos(atan2(ball.originX-this->getOriginX(),ball.originZ-this->getOriginZ())),-glm::sin(atan2(ball.originX-this->getOriginX(),ball.originZ-this->getOriginZ())));
+		glm::vec2 normal = glm::vec2(-glm::cos(atan2(ball.originX-this->getTransformedOriginX(),ball.originZ-this->getTransformedOriginZ())),-glm::sin(atan2(ball.originX-this->getTransformedOriginX(),ball.originZ-this->getTransformedOriginZ())));
 		glm::vec2 u = (glm::dot(ballSpeed,normal)/glm::dot(normal,normal))*normal;
 		glm::vec2 W = ballSpeed - u;
 		glm::vec2 newBallSpeed = W - u;
@@ -401,7 +426,7 @@ class Bumper : public Object2D{
 			float testPointX = ball.originX - glm::sin(i * angleIncrement)*ballRadius;
 			float testPointZ = ball.originZ - glm::cos(i * angleIncrement)*ballRadius;
 
-			if(sqrt(pow(ball.originX-this->getOriginX(),2)+pow(ball.originZ-this->getOriginZ(),2)) < this->getRadius()+ballRadius){
+			if(sqrt(pow(ball.originX-this->getTransformedOriginX(),2)+pow(ball.originZ-this->getTransformedOriginZ(),2)) < this->getRadius()+ballRadius){
 				ball.speedX = -newBallSpeed.y*BumperAccelerateBallSpeed;
 				ball.speedZ = -newBallSpeed.x*BumperAccelerateBallSpeed;
 				return ball; 
