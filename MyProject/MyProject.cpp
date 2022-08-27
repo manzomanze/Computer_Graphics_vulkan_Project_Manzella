@@ -61,6 +61,10 @@ class MyProject : public BaseProject {
 	Model RightBumper;
 	Texture RightBumperTexture;
 	DescriptorSet DSRightBumper;
+
+	Model Floor;
+	Texture FloorTexture;
+	DescriptorSet DSFloor;
 	
 	// Here you set the main application parameters
 	void setWindowParameters() {
@@ -71,9 +75,9 @@ class MyProject : public BaseProject {
 		initialBackgroundColor = {0.0f, 0.0f, 0.0f, 1.0f};
 		
 		// Descriptor pool sizes
-		uniformBlocksInPool = 8;
-		texturesInPool = 8;
-		setsInPool = 8;
+		uniformBlocksInPool = 9;
+		texturesInPool = 9;
+		setsInPool = 9;
 	}
 	
 	// Here you load and setup all your Vulkan objects
@@ -172,6 +176,15 @@ class MyProject : public BaseProject {
 					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &RightBumperTexture}
 				});
+
+		Floor.init(this, "models/PinballDark/floor.obj");
+		FloorTexture.init(this, "textures/horizontal-wood-plank-texture.jpg");
+
+
+		DSFloor.init(this, &DSL1, {
+					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+					{1, TEXTURE, 0, &FloorTexture}
+				});
 	}
 
 	// Here you destroy all the objects you created!		
@@ -208,6 +221,10 @@ class MyProject : public BaseProject {
 		DSRightBumper.cleanup();
 		RightBumperTexture.cleanup();
 		RightBumper.cleanup();
+
+		DSFloor.cleanup();
+		FloorTexture.cleanup();
+		Floor.cleanup();
 
 
 		DSL1.cleanup();
@@ -344,6 +361,19 @@ class MyProject : public BaseProject {
 		vkCmdDrawIndexed(commandBuffer,
 					static_cast<uint32_t>(RightBumper.indices.size()), 1, 0, 0, 0);
 
+		VkBuffer vertexBuffersFloor[] = {Floor.vertexBuffer};
+		VkDeviceSize offsetsFloor[] = {0};
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffersFloor, offsetsFloor);
+		vkCmdBindIndexBuffer(commandBuffer, Floor.indexBuffer, 0,
+								VK_INDEX_TYPE_UINT32);
+
+		vkCmdBindDescriptorSets(commandBuffer,
+						VK_PIPELINE_BIND_POINT_GRAPHICS,
+						P1.pipelineLayout, 0, 1, &DSFloor.descriptorSets[currentImage],
+						0, nullptr);
+						
+		vkCmdDrawIndexed(commandBuffer,
+					static_cast<uint32_t>(Floor.indices.size()), 1, 0, 0, 0);
 
 					
 	}
@@ -829,11 +859,15 @@ class MyProject : public BaseProject {
 						0.1f, 100.0f);
 		ubo.proj[1][1] *= -1;
 
-		ubo.lightDir = glm::vec3(cos(glm::radians(0.0f)) * cos(glm::radians(0.0f)), sin(glm::radians(0.0f)) * cos(glm::radians(0.0f)), sin(glm::radians(90.0f)));
-		ubo.lightPos = glm::vec3(3.0f, 3.0f, 0.0f);
+		static float time2 = 0;
+		time2 = time2 + deltaT;
+
+		ubo.lightDir = glm::vec3(-0.4830f, 0.8365f, -0.2588f);
+		/* glm::vec3(cos(glm::radians(0.0f))  * cos(glm::radians(30.0f*time2)) , sin(glm::radians(90.0f)), 	cos(glm::radians(90.0f))  * sin(glm::radians(30.0f*time2)) ); */
+		ubo.lightPos = glm::vec3(3.0f, 5.0f, 0.0f);
 		ubo.lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		ubo.eyePos = glm::vec3(5.0f+cameraX+valueX, 0.0f+cameraY+valueY, cameraZ+valueZ);
-		ubo.coneInOutDecayExp = glm::vec4(0.9f, 0.92f, 2.0f, 2.0f);
+		ubo.eyePos = glm::vec3(5.0f, 3.0f, 0.0f);
+		ubo.coneInOutDecayExp = glm::vec4(0.9f, 0.92f, 2.0f, 1.0f);
 		
 		void* data;
 
@@ -901,6 +935,13 @@ class MyProject : public BaseProject {
 							sizeof(ubo), 0, &data);
 		memcpy(data, &ubo, sizeof(ubo));
 		vkUnmapMemory(device, DSRightBumper.uniformBuffersMemory[0][currentImage]);
+
+		ubo.model = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,-3.0f,0.0f));
+					
+		vkMapMemory(device, DSFloor.uniformBuffersMemory[0][currentImage], 0,
+							sizeof(ubo), 0, &data);
+		memcpy(data, &ubo, sizeof(ubo));
+		vkUnmapMemory(device, DSFloor.uniformBuffersMemory[0][currentImage]);
 	}	
 };
 
