@@ -455,6 +455,33 @@ class MyProject : public BaseProject {
 		
 		static auto previousReleaseValueOfSpace = GLFW_RELEASE;
 
+		bool leftFlipperMovingUp, leftFlipperMovingDown;
+
+		Wall TopWall(topXMargin-sideWallDepth, topXMargin, bottomYMargin, 	topYMargin, rightZMargin, leftZMargin, 3.14/2, "top-wall", BodyPosition);
+		
+		Wall RightWall(topXMargin, bottomXMargin, bottomYMargin, topYMargin, rightZMargin-sideWallDepth, rightZMargin, 0.0f, "right-wall", BodyPosition);
+
+		Wall LeftWall(topXMargin, bottomXMargin, bottomYMargin, topYMargin, leftZMargin, leftZMargin+sideWallDepth, 0.0f, "right-wall", BodyPosition);
+		
+		Wall BottomRightWall(bottomXMargin, bottomXMargin+sideWallDepth, bottomYMargin, topYMargin, rightZMargin, rightFlipperMargin, -3.14/2, "bottom-right-wall", BodyPosition);
+
+		Wall BottomLeftWall(bottomXMargin, bottomXMargin+sideWallDepth, bottomYMargin, topYMargin, leftFlipperMargin, leftZMargin, -3.14/2, "bottom-right-wall", BodyPosition);
+				
+		Flipper LeftFlipperTest(FlipperBottomLeftX, FlipperBottomLeftZ, FlipperBottomRightX, FlipperBottomRightZ, FlipperTopLeftX, FlipperTopLeftZ, FlipperTopRightX, FlipperTopRightZ, leftFlipperRotate-120.0f, "left-flipper",bottomXMargin-0.7f, ballRadius,leftFlipperMargin,BodyPosition);
+
+		Flipper RightFlipperTest(FlipperBottomLeftX, FlipperBottomLeftZ, FlipperBottomRightX, FlipperBottomRightZ, FlipperTopLeftX, FlipperTopLeftZ, FlipperTopRightX, FlipperTopRightZ, rightFlipperRotate+120.0f, "left-flipper",bottomXMargin-0.7f, ballRadius,rightFlipperMargin, BodyPosition);
+		
+		LeftFlipperTest.setFlipperMovingDown(false);
+		LeftFlipperTest.setFlipperMovingUp(false);
+		RightFlipperTest.setFlipperMovingDown(false);
+		RightFlipperTest.setFlipperMovingUp(false);
+
+		Bumper LeftBumperTest(/* radius input */0.2f, "left-bumper", 0.0f, 1.5f, BodyPosition);
+
+		Bumper CentreBumperTest(/* radius input */0.2f, "centre-bumper", -1.0f, 0.0f, BodyPosition);
+
+		Bumper RightBumperTest(/* radius input */0.2f, "right-bumper", 0.0f, -1.5f, BodyPosition);
+
 		
 		///Ball.speedX = 0.0f;
 		/* 
@@ -540,14 +567,23 @@ class MyProject : public BaseProject {
 		/* left flipper rotate */
 		{
 			if(glfwGetKey(window,GLFW_KEY_G)){
-				
-				if(leftFlipperRotate<=60.0f){
+
+				if(leftFlipperRotate==60.0f){
+					LeftFlipperTest.setFlipperMovingUp(false);
+					LeftFlipperTest.setFlipperMovingDown(false);
+				}
+				if(leftFlipperRotate<60.0f){
 					leftFlipperRotate = leftFlipperRotate+flipperRotateSpeed*deltaT;
-					
+					LeftFlipperTest.setFlipperMovingUp(true);
 				}
 			}else{
-				if(leftFlipperRotate>=0.0f){
+				if(leftFlipperRotate==0.0f){
+					LeftFlipperTest.setFlipperMovingUp(false);
+					LeftFlipperTest.setFlipperMovingDown(false);					
+				}
+				if(leftFlipperRotate>0.0f){
 					leftFlipperRotate = leftFlipperRotate-flipperRotateSpeed*deltaT;
+					LeftFlipperTest.setFlipperMovingDown(true);			
 					
 				}
 			}
@@ -623,31 +659,7 @@ class MyProject : public BaseProject {
 		std::cout<< "ball speed X:"<<Ball.speedX<< " Y "<< Ball.speedY<<" Z "<< Ball.speedZ<<std::endl;
 		std::cout<< "ball speed in Global reference X:"<<BallSpeedWRTBody.x<< " Y "<< BallSpeedWRTBody.y<<" Z "<< BallSpeedWRTBody.z<<std::endl; */
 
-		Wall TopWall(topXMargin-sideWallDepth, topXMargin, bottomYMargin, topYMargin, rightZMargin, leftZMargin, 3.14/2, 
-			"top-wall", BodyPosition);
-		
-		Wall RightWall(topXMargin, bottomXMargin, bottomYMargin, topYMargin, rightZMargin-sideWallDepth, rightZMargin, 0.0f, 
-			"right-wall", BodyPosition);
 
-		Wall LeftWall(topXMargin, bottomXMargin, bottomYMargin, topYMargin, leftZMargin, leftZMargin+sideWallDepth, 0.0f, 
-			"right-wall", BodyPosition);
-		
-		Wall BottomRightWall(bottomXMargin, bottomXMargin+sideWallDepth, bottomYMargin, topYMargin, rightZMargin, rightFlipperMargin, -3.14/2, 
-			"bottom-right-wall", BodyPosition);
-
-		Wall BottomLeftWall(bottomXMargin, bottomXMargin+sideWallDepth, bottomYMargin, topYMargin, leftFlipperMargin, leftZMargin, -3.14/2, 
-			"bottom-right-wall", BodyPosition);
-				
-		Flipper LeftFlipperTest(FlipperBottomLeftX, FlipperBottomLeftZ, FlipperBottomRightX, FlipperBottomRightZ, FlipperTopLeftX, FlipperTopLeftZ, FlipperTopRightX, FlipperTopRightZ, leftFlipperRotate-120.0f, "left-flipper",bottomXMargin-0.7f, ballRadius,leftFlipperMargin,BodyPosition);
-
-		Flipper RightFlipperTest(FlipperBottomLeftX, FlipperBottomLeftZ, FlipperBottomRightX, FlipperBottomRightZ, FlipperTopLeftX, FlipperTopLeftZ, FlipperTopRightX, FlipperTopRightZ, rightFlipperRotate+120.0f, "left-flipper",bottomXMargin-0.7f, ballRadius,rightFlipperMargin, BodyPosition);
-		
-
-		Bumper LeftBumperTest(/* radius input */0.2f, "left-bumper", 0.0f, 1.5f, BodyPosition);
-
-		Bumper CentreBumperTest(/* radius input */0.2f, "centre-bumper", -1.0f, 0.0f, BodyPosition);
-
-		Bumper RightBumperTest(/* radius input */0.2f, "right-bumper", 0.0f, -1.5f, BodyPosition);
 
 
 		Ball = RightWall.bounceBall(Ball);

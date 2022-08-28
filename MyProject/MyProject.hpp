@@ -164,138 +164,12 @@ struct MovingRotationalObjectDimensions : RotationalObjectDimensions{
 };
 
 
-bool intersect(ObjectDimensions a, ObjectDimensions b) {
-  return (a.minX <= b.maxX && a.maxX >= b.minX) &&
-         (a.minZ <= b.maxZ && a.maxZ >= b.minZ);
-         
-}
-
-/* bool intersectBall(MovingRotationalObjectDimensions a, ObjectDimensions b) {
-  float angleResolution = 24;
-  float angleIncrement = 360.0f / angleResolution;
-  
-  	for(int i = 0; i<24;i++){
-		if((a.originX - glm::sin(i * angleIncrement)*ballRadius <= b.maxX && a.originX - glm::sin(i * angleIncrement)*ballRadius >= b.minX) &&
-			(a.originZ - glm::cos(i * angleIncrement)*ballRadius <= b.maxZ && a.originZ - glm::cos(i * angleIncrement)*ballRadius >= b.minZ)){
-				return true;
-		}
-	}
-	
-	return false;
-} */
-  
-MovingRotationalObjectDimensions intersectBallOrientedObstacle(MovingRotationalObjectDimensions ball, OrientableObjectDimensions b) {
-	float angleResolution = 8;
-	float angleIncrement = 360.0f / angleResolution;
-		
-	// This should give us the angle of the ball movement with respect to  natural axis with Z new to the right and Xnew ging away from the User
-	float ballMovementAngle = atan2(-ball.speedX,-ball.speedZ);
-	/* std::cout<<ballMovementAngle<<std::endl; */
-
-	//collision calculation using vectors
-	glm::vec2 ballSpeed = glm::vec2(-ball.speedZ,-ball.speedX);
-	glm::vec2 normal = glm::vec2(-glm::cos(b.orientationWithRespectToNegativeZaxis),-glm::sin(b.orientationWithRespectToNegativeZaxis));
-	glm::vec2 u = (glm::dot(ballSpeed,normal)/glm::dot(normal,normal))*normal;
-	glm::vec2 W = ballSpeed - u;
-	glm::vec2 newBallSpeed = W - u;
-	//std::cout<< "speed NEWWW X:"<<newBallSpeed.x<< " Z "<< newBallSpeed.y<<std::endl;
-  
-	for(int i = 0; i<angleResolution;i++){
-		if((ball.originX - glm::sin(i * angleIncrement)*ballRadius <= b.maxX && ball.originX - glm::sin(i * angleIncrement)*ballRadius >= b.minX) &&
-			(ball.originZ - glm::cos(i * angleIncrement)*ballRadius <= b.maxZ && ball.originZ - glm::cos(i * angleIncrement)*ballRadius >= b.minZ) && 
-			(ball.originY  <= b.maxY && ball.originY  >= b.minY)){
-				ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed;
-				ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed;
-				return ball;
-		}
-	}	
-
-  	return ball;     
-}
-
-
-
-
-/* MovingRotationalObjectDimensions intersectBallObjectPointByPoint(MovingRotationalObjectDimensions ball, ObjectPointByPoint b, glm::vec4 FlipperFulcrum) {
-	float angleResolution = 8;
-	float angleIncrement = 360.0f / angleResolution;
-		
-	// This should give us the angle of the ball movement with respect to  natural axis with Z new to the right and Xnew ging away from the User
-	float ballMovementAngle = atan2(-ball.speedX,-ball.speedZ);
-	/* std::cout<<ballMovementAngle<<std::endl; */
-
-	
-
-	//collision calculation using vectors
-	/* glm::vec2 ballSpeed = glm::vec2(-ball.speedZ,-ball.speedX);
-	glm::vec2 normal = glm::vec2(-glm::cos(b.orientationWithRespectToNegativeZaxis),-glm::sin(b.orientationWithRespectToNegativeZaxis));
-	glm::vec2 u = (glm::dot(ballSpeed,normal)/glm::dot(normal,normal))*normal;
-	glm::vec2 W = ballSpeed - u;
-	glm::vec2 newBallSpeed = W - u; */
-	//std::cout<< "speed NEWWW X:"<<newBallSpeed.x<< " Z "<< newBallSpeed.y<<std::endl;
-  
-	
-
-
-	/* for(int i = 0; i<angleResolution;i++){
-		float testPointX = ball.originX - glm::sin(i * angleIncrement)*ballRadius;
-		float testPointZ = ball.originZ - glm::cos(i * angleIncrement)*ballRadius;
-
-		if(pointIsInside(testPointX,testPointZ,b)){
-			float distanceFromFlipperFulcrum = calculateDistanceFromFlipperFulcrum(testPointX,testPointZ,FlipperFulcrum);
-
-			ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed-coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
-			ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed-coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
-			return ball; 
-		}
-	
-	}  
-
-  	return ball; 
-	  
-} */
- 
-
-MovingRotationalObjectDimensions intersectBallObjectRotationalObject(MovingRotationalObjectDimensions ball, RotationalObjectDimensions b) {
-	float angleResolution = 8;
-	float angleIncrement = 360.0f / angleResolution;
-		
-	// This should give us the angle of the ball movement with respect to  natural axis with Z new to the right and Xnew ging away from the User
-	float ballMovementAngle = atan2(-ball.speedX,-ball.speedZ);
-	/* std::cout<<ballMovementAngle<<std::endl; */
-
-	
-
-	//collision calculation using vectors
-	glm::vec2 ballSpeed = glm::vec2(-ball.speedZ,-ball.speedX);
-	glm::vec2 normal = glm::vec2(-glm::cos(atan2(ball.originX-b.originX,ball.originZ-b.originZ)),-glm::sin(atan2(ball.originX-b.originX,ball.originZ-b.originZ)));
-	glm::vec2 u = (glm::dot(ballSpeed,normal)/glm::dot(normal,normal))*normal;
-	glm::vec2 W = ballSpeed - u;
-	glm::vec2 newBallSpeed = W - u;
-	//std::cout<< "speed NEWWW X:"<<newBallSpeed.x<< " Z "<< newBallSpeed.y<<std::endl;
-  
-	
-
-
-	for(int i = 0; i<angleResolution;i++){
-		float testPointX = ball.originX - glm::sin(i * angleIncrement)*ballRadius;
-		float testPointZ = ball.originZ - glm::cos(i * angleIncrement)*ballRadius;
-
-		if(sqrt(pow(ball.originX-b.originX,2)+pow(ball.originZ-b.originZ,2)) < b.radius+ballRadius){
-			ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed;
-			ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed;
-			return ball; 
-		}
-
-		
-		
-	
-	}  
-
-  	return ball; 
-	  
-}
-
+struct edgesToTheLeftStruct{
+	bool firstEdge;
+	bool secondEdge;
+	bool thirdEdge;
+	bool fourthEdge;
+};
 
 
 
@@ -624,6 +498,10 @@ class Flipper : public MovingObject2D{
 		float topLeftZ;
 		float topRightX;
 		float topRightZ;
+		bool flipperMovingUp;
+		bool flipperMovingDown;
+		edgesToTheLeftStruct edgesToTheLeft; 
+		int lastEdgeChanged;
 
 		
 
@@ -643,6 +521,12 @@ class Flipper : public MovingObject2D{
 			topLeftZ = topLeftZinput;
 			topRightX = topRightXinput;
 			topRightZ = topRightZinput;
+
+			edgesToTheLeft.firstEdge = false;
+			edgesToTheLeft.secondEdge = false;
+			edgesToTheLeft.thirdEdge = false;
+			edgesToTheLeft.fourthEdge = false;
+			lastEdgeChanged = 0;
 		}
 
 		MovingRotationalObjectDimensions bounceBall (MovingRotationalObjectDimensions ball);
@@ -664,6 +548,8 @@ class Flipper : public MovingObject2D{
 		float getTransformedtopLeftZ();
 		float getTransformedtopRightX();
 		float getTransformedtopRightZ();
+		void setFlipperMovingUp(bool flipperMovingUpinput);
+		void setFlipperMovingDown(bool flipperMovingDowninput);
 		glm::mat4 getResultingTransformationMatrix();
 		glm::vec4 getResultingTransformationVector();
 		bool pointIsleftToTheVector(float testPointX, float testPointY, float prismPoint1X, float prismPoint1Y, float prismPoint2X,float prismPoint2Y);
@@ -704,6 +590,22 @@ class Flipper : public MovingObject2D{
 		return topRightZ;
 	}
 
+	void Flipper::setFlipperMovingUp(bool flipperMovingUpinput){
+		flipperMovingUp = flipperMovingUpinput;
+	}
+
+	void Flipper::setFlipperMovingDown(bool flipperMovingDowninput){
+		flipperMovingDown = flipperMovingDowninput;
+	}
+
+	/* bool Flipper::getFlipperMovingUp(){
+		flipperMovingUp = flipperMovingUpinput;
+	}
+
+	bool Flipper::getFlipperMovingDown(){
+		flipperMovingDown = flipperMovingDowninput;
+	}
+ */
 	float Flipper::getTransformedbottomLeftX(){
 		glm::vec4 FlipperBottomLeftVector = this->getResultingTransformationMatrix()*glm::vec4(this->getbottomLeftX(),0.0f,this->getbottomLeftZ(),1.0f);
 		return FlipperBottomLeftVector.x;
@@ -757,7 +659,7 @@ class Flipper : public MovingObject2D{
 
 
 	MovingRotationalObjectDimensions Flipper::bounceBall(MovingRotationalObjectDimensions ball) {
-		float angleResolution = 8;
+		float angleResolution = 4;
 		float angleIncrement = 360.0f / angleResolution;
 			
 		// This should give us the angle of the ball movement with respect to  natural axis with Z new to the right and Xnew ging away from the User
@@ -766,13 +668,7 @@ class Flipper : public MovingObject2D{
 
 		
 
-		//collision calculation using vectors
-		glm::vec2 ballSpeed = glm::vec2(-ball.speedZ,-ball.speedX);
-		glm::vec2 normal = glm::vec2(-glm::cos(this->getRotationAngle()),-glm::sin(this->getRotationAngle()));
-		glm::vec2 u = (glm::dot(ballSpeed,normal)/glm::dot(normal,normal))*normal;
-		glm::vec2 W = ballSpeed - u;
-		glm::vec2 newBallSpeed = W - u;
-		//std::cout<< "speed NEWWW X:"<<newBallSpeed.x<< " Z "<< newBallSpeed.y<<std::endl;
+
 	
 		
 
@@ -784,8 +680,14 @@ class Flipper : public MovingObject2D{
 			if(pointIsInside(testPointX,testPointZ)){
 				float distanceFromFlipperFulcrum = calculateDistanceFromFlipperFulcrum(testPointX,testPointZ,this->getResultingTransformationVector());
 
-				ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed-coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
-				ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed-coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
+				glm::vec2 ballSpeed = glm::vec2(-ball.speedZ,-ball.speedX);
+				glm::vec2 normal = glm::vec2(-glm::cos(this->getRotationAngle()-(lastEdgeChanged-1)*glm::radians(90.0f)),-glm::sin(this->getRotationAngle()-(lastEdgeChanged-1)*glm::radians(90.0f)));
+				glm::vec2 u = (glm::dot(ballSpeed,normal)/glm::dot(normal,normal))*normal;
+				glm::vec2 W = ballSpeed - u;
+				glm::vec2 newBallSpeed = W - u;
+
+				ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed -coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
+				ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed -coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
 				return ball; 
 			}
 		
@@ -808,12 +710,27 @@ class Flipper : public MovingObject2D{
 	}
 
 	bool Flipper::pointIsInside(float testPointX, float testPointZ){
+		lastEdgeChanged = 0;
 		
-
 		bool firstEdge = pointIsleftToTheVector(testPointX,testPointZ,this->getTransformedbottomRightX(),this->getTransformedbottomRightZ(),this->getTransformedbottomLeftX(),this->getTransformedbottomLeftZ());
+		if(firstEdge != edgesToTheLeft.firstEdge){
+			lastEdgeChanged = 1;
+		}
+
 		bool secondEdge = pointIsleftToTheVector(testPointX,testPointZ,this->getTransformedtopRightX(),this->getTransformedtopRightZ(),this->getTransformedbottomRightX(),this->getTransformedbottomRightZ());
+		if(secondEdge != edgesToTheLeft.secondEdge){
+			lastEdgeChanged = 2;
+		}
+
 		bool thirdEdge = pointIsleftToTheVector(testPointX,testPointZ,this->getTransformedtopLeftX(),this->getTransformedtopLeftZ(),this->getTransformedtopRightX(),this->getTransformedtopRightZ());
+		if(thirdEdge != edgesToTheLeft.thirdEdge){
+			lastEdgeChanged = 3;
+		}
+
 		bool fourthEdge = pointIsleftToTheVector(testPointX,testPointZ,this->getTransformedbottomLeftX(),this->getTransformedbottomLeftZ(),this->getTransformedtopLeftX(),this->getTransformedtopLeftZ());
+		if(fourthEdge != edgesToTheLeft.fourthEdge){
+			lastEdgeChanged = 4;
+		}
 		/* std::cout<<std::endl;
 
 		std::cout<<firstEdge<<secondEdge<<thirdEdge<<fourthEdge<<std::endl; */
