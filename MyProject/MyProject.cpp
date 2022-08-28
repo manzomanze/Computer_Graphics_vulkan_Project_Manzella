@@ -471,10 +471,8 @@ class MyProject : public BaseProject {
 
 		Flipper RightFlipperTest(FlipperBottomLeftX, FlipperBottomLeftZ, FlipperBottomRightX, FlipperBottomRightZ, FlipperTopLeftX, FlipperTopLeftZ, FlipperTopRightX, FlipperTopRightZ, rightFlipperRotate+120.0f, "left-flipper",bottomXMargin-0.7f, ballRadius,rightFlipperMargin, BodyPosition);
 		
-		LeftFlipperTest.setFlipperMovingDown(false);
-		LeftFlipperTest.setFlipperMovingUp(false);
-		RightFlipperTest.setFlipperMovingDown(false);
-		RightFlipperTest.setFlipperMovingUp(false);
+		LeftFlipperTest.setFlipperMoving(false);
+		RightFlipperTest.setFlipperMoving(false);
 
 		Bumper LeftBumperTest(/* radius input */0.2f, "left-bumper", 0.0f, 1.5f, BodyPosition);
 
@@ -569,21 +567,19 @@ class MyProject : public BaseProject {
 			if(glfwGetKey(window,GLFW_KEY_G)){
 
 				if(leftFlipperRotate==60.0f){
-					LeftFlipperTest.setFlipperMovingUp(false);
-					LeftFlipperTest.setFlipperMovingDown(false);
+					LeftFlipperTest.setFlipperMoving(false);
 				}
 				if(leftFlipperRotate<60.0f){
 					leftFlipperRotate = leftFlipperRotate+flipperRotateSpeed*deltaT;
-					LeftFlipperTest.setFlipperMovingUp(true);
+					LeftFlipperTest.setFlipperMoving(true);
 				}
 			}else{
 				if(leftFlipperRotate==0.0f){
-					LeftFlipperTest.setFlipperMovingUp(false);
-					LeftFlipperTest.setFlipperMovingDown(false);					
+					LeftFlipperTest.setFlipperMoving(false);
 				}
 				if(leftFlipperRotate>0.0f){
 					leftFlipperRotate = leftFlipperRotate-flipperRotateSpeed*deltaT;
-					LeftFlipperTest.setFlipperMovingDown(true);			
+					LeftFlipperTest.setFlipperMoving(true);			
 					
 				}
 			}

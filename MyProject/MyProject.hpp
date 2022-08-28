@@ -39,10 +39,10 @@ const int MAX_FRAMES_IN_FLIGHT = 2;
 
 const float ballRadius = 0.20f;
 const float sideWallDepth = 0.30f;
-const float effectOfCollisionOnSpeed = 1.0;
+const float effectOfCollisionOnSpeed = 0.99999;
 const float flipperRotateSpeed = 200.0f;
 const float coeffiecientOfFlipperBallSpeed = 0.007f;
-const float BumperAccelerateBallSpeed = 1.07f;
+const float BumperAccelerateBallSpeed = 1.007f;
 
 // Lesson 22.0
 const std::vector<const char*> validationLayers = {
@@ -498,8 +498,7 @@ class Flipper : public MovingObject2D{
 		float topLeftZ;
 		float topRightX;
 		float topRightZ;
-		bool flipperMovingUp;
-		bool flipperMovingDown;
+		bool flipperMoving;
 		edgesToTheLeftStruct edgesToTheLeft; 
 		int lastEdgeChanged;
 
@@ -548,8 +547,7 @@ class Flipper : public MovingObject2D{
 		float getTransformedtopLeftZ();
 		float getTransformedtopRightX();
 		float getTransformedtopRightZ();
-		void setFlipperMovingUp(bool flipperMovingUpinput);
-		void setFlipperMovingDown(bool flipperMovingDowninput);
+		void setFlipperMoving(bool flipperMovinginput);
 		glm::mat4 getResultingTransformationMatrix();
 		glm::vec4 getResultingTransformationVector();
 		bool pointIsleftToTheVector(float testPointX, float testPointY, float prismPoint1X, float prismPoint1Y, float prismPoint2X,float prismPoint2Y);
@@ -590,12 +588,8 @@ class Flipper : public MovingObject2D{
 		return topRightZ;
 	}
 
-	void Flipper::setFlipperMovingUp(bool flipperMovingUpinput){
-		flipperMovingUp = flipperMovingUpinput;
-	}
-
-	void Flipper::setFlipperMovingDown(bool flipperMovingDowninput){
-		flipperMovingDown = flipperMovingDowninput;
+	void Flipper::setFlipperMoving(bool flipperMovinginput){
+		flipperMoving = flipperMovinginput;
 	}
 
 	/* bool Flipper::getFlipperMovingUp(){
@@ -686,8 +680,12 @@ class Flipper : public MovingObject2D{
 				glm::vec2 W = ballSpeed - u;
 				glm::vec2 newBallSpeed = W - u;
 
-				ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed -coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
-				ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed -coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
+				ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed;
+				ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed;
+				if(flipperMoving){
+					ball.speedX = ball.speedX -coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
+					ball.speedZ = ball.speedZ -coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
+				}
 				return ball; 
 			}
 		
