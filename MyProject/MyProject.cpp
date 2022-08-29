@@ -16,6 +16,16 @@ struct UniformBufferObject {
 	alignas(16) glm::vec4 coneInOutDecayExp;
 };
 
+struct GlobalUniformBufferObject {
+	alignas(16) glm::mat4 model;
+	alignas(16) glm::mat4 view;
+	alignas(16) glm::mat4 proj;
+	alignas(16) glm::vec3 lightDir;
+	alignas(16) glm::vec3 lightPos;
+	alignas(16) glm::vec3 lightColor;
+	alignas(16) glm::vec3 eyePos;
+	alignas(16) glm::vec4 coneInOutDecayExp;
+};
 
 
 // MAIN ! 
@@ -109,7 +119,7 @@ class MyProject : public BaseProject {
 		// second element : UNIFORM or TEXTURE (an enum) depending on the type
 		// third  element : only for UNIFORMs, the size of the corresponding C++ object
 		// fourth element : only for TEXTUREs, the pointer to the corresponding texture object
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+					{0, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &BodyTexture}
 				});
 
@@ -118,7 +128,7 @@ class MyProject : public BaseProject {
 		PullerTexture.init(this, "textures/StarWarsPinballColors.png");
 
 		DSPuller.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+					{0, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &PullerTexture}
 				});
 		
@@ -128,7 +138,7 @@ class MyProject : public BaseProject {
 
 
 		DSBall.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+					{0, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &BallTexture}
 				});
 
@@ -137,7 +147,7 @@ class MyProject : public BaseProject {
 
 
 		DSLeftFlipper.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+					{0, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &LeftFlipperTexture}
 				});
 
@@ -146,7 +156,7 @@ class MyProject : public BaseProject {
 
 
 		DSRightFlipper.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+					{0, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &RightFlipperTexture}
 				});
 
@@ -155,7 +165,7 @@ class MyProject : public BaseProject {
 
 
 		DSLeftBumper.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+					{0, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &LeftBumperTexture}
 				});
 
@@ -164,7 +174,7 @@ class MyProject : public BaseProject {
 
 
 		DSCentreBumper.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+					{0, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &CentreBumperTexture}
 				});
 		
@@ -173,7 +183,7 @@ class MyProject : public BaseProject {
 
 
 		DSRightBumper.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+					{0, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &RightBumperTexture}
 				});
 
@@ -182,7 +192,7 @@ class MyProject : public BaseProject {
 
 
 		DSFloor.init(this, &DSL1, {
-					{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+					{0, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &FloorTexture}
 				});
 	}
@@ -388,6 +398,7 @@ class MyProject : public BaseProject {
 					
 					
 		UniformBufferObject ubo{};
+		GlobalUniformBufferObject gubo{};
 
 		static float lastTime=0.0f;
 
@@ -688,9 +699,9 @@ class MyProject : public BaseProject {
 
 		
 
-		ubo.model = BodyPosition;
+		gubo.model = BodyPosition;
 		// Camera Position parallell to the playing plane
-		ubo.view = glm::lookAt(glm::vec3(5.0f+cameraX+valueX, 0.0f+cameraY+valueY, cameraZ+valueZ),
+		gubo.view = glm::lookAt(glm::vec3(5.0f+cameraX+valueX, 0.0f+cameraY+valueY, cameraZ+valueZ),
 							   glm::vec3(0.0f+cameraX, 0.0f+cameraY, 0.0f+cameraZ),
 							   glm::vec3(0.0f, 1.0f, 0.0f))*
 
@@ -702,93 +713,93 @@ class MyProject : public BaseProject {
 								glm::radians(cameraYaw),
 								glm::vec3(0.0f, 1.0f, 0.0f));
 		
-		ubo.proj = glm::perspective(glm::radians(70.0f),
+		gubo.proj = glm::perspective(glm::radians(70.0f),
 						swapChainExtent.width / (float) swapChainExtent.height,
 						0.1f, 100.0f);
-		ubo.proj[1][1] *= -1;
+		gubo.proj[1][1] *= -1;
 
 		static float time2 = 0;
 		time2 = time2 + deltaT;
 
-		ubo.lightDir = glm::vec3(-0.4830f, 0.8365f, -0.2588f);
+		gubo.lightDir = glm::vec3(-0.4830f, 0.8365f, -0.2588f);
 		/* glm::vec3(cos(glm::radians(0.0f))  * cos(glm::radians(30.0f*time2)) , sin(glm::radians(90.0f)), 	cos(glm::radians(90.0f))  * sin(glm::radians(30.0f*time2)) ); */
-		ubo.lightPos = glm::vec3(3.0f, 5.0f, 0.0f);
-		ubo.lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		ubo.eyePos = glm::vec3(5.0f, 3.0f, 0.0f);
-		ubo.coneInOutDecayExp = glm::vec4(0.9f, 0.92f, 2.0f, 1.0f);
+		gubo.lightPos = glm::vec3(3.0f, 5.0f, 0.0f);
+		gubo.lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		gubo.eyePos = glm::vec3(5.0f, 3.0f, 0.0f);
+		gubo.coneInOutDecayExp = glm::vec4(0.9f, 0.92f, 2.0f, 1.0f);
 		
 		void* data;
 
 		// Here is where you actually update your uniforms
 		//Body
 		vkMapMemory(device, DSBody.uniformBuffersMemory[0][currentImage], 0,
-							sizeof(ubo), 0, &data);
-		memcpy(data, &ubo, sizeof(ubo));
+							sizeof(gubo), 0, &data);
+		memcpy(data, &gubo, sizeof(gubo));
 		vkUnmapMemory(device, DSBody.uniformBuffersMemory[0][currentImage]);
 
 		//Puller Position
-		ubo.model = PullerCurrentPosition*
+		gubo.model = PullerCurrentPosition*
 					glm::rotate(glm::mat4(1.0f),
 								glm::radians(-90.0f),
 								glm::vec3(0.0f, 0.0f, 1.0f));
 		vkMapMemory(device, DSPuller.uniformBuffersMemory[0][currentImage], 0,
-							sizeof(ubo), 0, &data);
-		memcpy(data, &ubo, sizeof(ubo));
+							sizeof(gubo), 0, &data);
+		memcpy(data, &gubo, sizeof(gubo));
 		vkUnmapMemory(device, DSPuller.uniformBuffersMemory[0][currentImage]);
 
 		//Ball Position
-		ubo.model = BallCurrentPosition;
+		gubo.model = BallCurrentPosition;
 					
 		vkMapMemory(device, DSBall.uniformBuffersMemory[0][currentImage], 0,
-							sizeof(ubo), 0, &data);
-		memcpy(data, &ubo, sizeof(ubo));
+							sizeof(gubo), 0, &data);
+		memcpy(data, &gubo, sizeof(gubo));
 		vkUnmapMemory(device, DSBall.uniformBuffersMemory[0][currentImage]);
 
 		//Left Flipper Position
-		ubo.model = LeftFlipperTest.getResultingTransformationMatrix();
+		gubo.model = LeftFlipperTest.getResultingTransformationMatrix();
 					
 		vkMapMemory(device, DSLeftFlipper.uniformBuffersMemory[0][currentImage], 0,
-							sizeof(ubo), 0, &data);
-		memcpy(data, &ubo, sizeof(ubo));
+							sizeof(gubo), 0, &data);
+		memcpy(data, &gubo, sizeof(gubo));
 		vkUnmapMemory(device, DSLeftFlipper.uniformBuffersMemory[0][currentImage]);
 
 		//Right Flipper Position
-		ubo.model = RightFlipperTest.getResultingTransformationMatrix();
+		gubo.model = RightFlipperTest.getResultingTransformationMatrix();
 					
 		vkMapMemory(device, DSRightFlipper.uniformBuffersMemory[0][currentImage], 0,
-							sizeof(ubo), 0, &data);
-		memcpy(data, &ubo, sizeof(ubo));
+							sizeof(gubo), 0, &data);
+		memcpy(data, &gubo, sizeof(gubo));
 		vkUnmapMemory(device, DSRightFlipper.uniformBuffersMemory[0][currentImage]);
 
 		// Left Bumper
-		ubo.model = LeftBumperTest.getResultingTransformationMatrix();
+		gubo.model = LeftBumperTest.getResultingTransformationMatrix();
 					
 		vkMapMemory(device, DSLeftBumper.uniformBuffersMemory[0][currentImage], 0,
-							sizeof(ubo), 0, &data);
-		memcpy(data, &ubo, sizeof(ubo));
+							sizeof(gubo), 0, &data);
+		memcpy(data, &gubo, sizeof(gubo));
 		vkUnmapMemory(device, DSLeftBumper.uniformBuffersMemory[0][currentImage]);
 
 		// Centre Bumper
-		ubo.model = CentreBumperTest.getResultingTransformationMatrix();
+		gubo.model = CentreBumperTest.getResultingTransformationMatrix();
 					
 		vkMapMemory(device, DSCentreBumper.uniformBuffersMemory[0][currentImage], 0,
-							sizeof(ubo), 0, &data);
-		memcpy(data, &ubo, sizeof(ubo));
+							sizeof(gubo), 0, &data);
+		memcpy(data, &gubo, sizeof(gubo));
 		vkUnmapMemory(device, DSCentreBumper.uniformBuffersMemory[0][currentImage]);
 
 		// Right Bumper
-		ubo.model = RightBumperTest.getResultingTransformationMatrix();
+		gubo.model = RightBumperTest.getResultingTransformationMatrix();
 					
 		vkMapMemory(device, DSRightBumper.uniformBuffersMemory[0][currentImage], 0,
-							sizeof(ubo), 0, &data);
-		memcpy(data, &ubo, sizeof(ubo));
+							sizeof(gubo), 0, &data);
+		memcpy(data, &gubo, sizeof(gubo));
 		vkUnmapMemory(device, DSRightBumper.uniformBuffersMemory[0][currentImage]);
 
-		ubo.model = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,-8.0f,0.0f));
+		gubo.model = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,-8.0f,0.0f));
 					
 		vkMapMemory(device, DSFloor.uniformBuffersMemory[0][currentImage], 0,
-							sizeof(ubo), 0, &data);
-		memcpy(data, &ubo, sizeof(ubo));
+							sizeof(gubo), 0, &data);
+		memcpy(data, &gubo, sizeof(gubo));
 		vkUnmapMemory(device, DSFloor.uniformBuffersMemory[0][currentImage]);
 	}	
 };

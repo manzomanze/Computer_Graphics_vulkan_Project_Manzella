@@ -9,7 +9,7 @@ layout(location = 3) in vec3 fragPos;
 
 layout(location = 0) out vec4 outColor;
 
-layout(binding = 0) uniform UniformBufferObject {
+layout(binding = 0) uniform GlobalUniformBufferObject {
 	mat4 model;
 	mat4 view;
 	mat4 proj;
@@ -18,39 +18,39 @@ layout(binding = 0) uniform UniformBufferObject {
 	vec3 lightColor;
 	vec3 eyePos;
 	vec4 coneInOutDecayExp;
-}ubo;
+}gubo;
 
 vec3 direct_light_dir(vec3 pos) {
 	// Directional light direction
-	return vec3(ubo.lightDir.x, ubo.lightDir.y, ubo.lightDir.z);
+	return vec3(gubo.lightDir.x, gubo.lightDir.y, gubo.lightDir.z);
 }
 
 vec3 direct_light_color(vec3 pos) {
 	// Directional light color
-	return vec3(ubo.lightColor.x,ubo.lightColor.y ,ubo.lightColor.z );
+	return vec3(gubo.lightColor.x,gubo.lightColor.y ,gubo.lightColor.z );
 }
 
 vec3 point_light_dir(vec3 pos) {
 	// Point light direction
-	vec3 direction = vec3(ubo.lightPos-pos);
+	vec3 direction = vec3(gubo.lightPos-pos);
 	return normalize(direction);
 }
 
 vec3 point_light_color(vec3 pos) {
 	// Point light color
-	float g = ubo.coneInOutDecayExp.z;
-	vec3 direction = vec3(ubo.lightPos-pos);
+	float g = gubo.coneInOutDecayExp.z;
+	vec3 direction = vec3(gubo.lightPos-pos);
 	float distance = length(direction);
-	float decay = ubo.coneInOutDecayExp.w;
+	float decay = gubo.coneInOutDecayExp.w;
 	float lightModel = pow(g/distance,decay);
-	return vec3(ubo.lightColor.x*lightModel,ubo.lightColor.y*lightModel ,ubo.lightColor.z*lightModel );
+	return vec3(gubo.lightColor.x*lightModel,gubo.lightColor.y*lightModel ,gubo.lightColor.z*lightModel );
 }
 
 void main() {
 	const vec3  diffColor = texture(texSampler, fragTexCoord).rgb;
 	const vec3  specColor = vec3(1.0f, 1.0f, 1.0f);
 	const float specPower = 150.0f;
-	vec3 EyeDir = normalize(ubo.eyePos.xyz - fragPos);
+	vec3 EyeDir = normalize(gubo.eyePos.xyz - fragPos);
 
 	vec3 N = normalize(fragNorm);
 	vec3 R = EyeDir;
