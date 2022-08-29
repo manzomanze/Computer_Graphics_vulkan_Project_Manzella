@@ -632,6 +632,10 @@ class MyProject : public BaseProject {
 		Ball.speedX = Ball.speedX+activeGravity*gravityconstant*deltaT;
 		glm::vec4 BallSpeedWRTBody = BodyPositionRotation*glm::vec4(Ball.speedX,Ball.speedY,Ball.speedZ,1.0f);
 
+		std::cout<<sqrt(pow(Ball.speedX,2)+pow(Ball.speedZ,2))<<std::endl;
+
+		
+
 		// Update of ball speed in the coordinates of the body
 		ballX = ballX+BallSpeedWRTBody.x*deltaT;
 		ballY = ballY+BallSpeedWRTBody.y*deltaT;
@@ -658,7 +662,7 @@ class MyProject : public BaseProject {
 		/* std::cout<< "rightwall X: min"<<RightWall.minX<< " max "<< RightWall.maxX <<" min Z "<< RightWall.minZ <<" max  " <<RightWall.maxZ <<std::endl;
 		std::cout<< "rightwall Y: min"<<RightWall.minY<< " max "<< RightWall.minY<<std::endl; */
 
-		std::cout<< "ball origin X:"<<Ball.originX<< " Y "<< Ball.originY<<" Z "<< Ball.originZ<<std::endl;
+		//std::cout<< "ball origin X:"<<Ball.originX<< " Y "<< Ball.originY<<" Z "<< Ball.originZ<<std::endl;
 		/* std::cout<< "right wall Y: min"<<RightWall.minY<< " max "<< RightWall.maxY<<" Z "<< Ball.originZ<<std::endl;
 		std::cout<< "ball speed X:"<<Ball.speedX<< " Y "<< Ball.speedY<<" Z "<< Ball.speedZ<<std::endl;
 		std::cout<< "ball speed in Global reference X:"<<BallSpeedWRTBody.x<< " Y "<< BallSpeedWRTBody.y<<" Z "<< BallSpeedWRTBody.z<<std::endl; */

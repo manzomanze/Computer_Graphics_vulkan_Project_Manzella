@@ -39,7 +39,7 @@ const int MAX_FRAMES_IN_FLIGHT = 2;
 
 const float ballRadius = 0.15f;
 const float sideWallDepth = 0.30f;
-const float effectOfCollisionOnSpeed = 0.97;
+const float effectOfCollisionOnSpeed = 1.0f;
 const float flipperRotateSpeed = 200.0f;
 const float coeffiecientOfFlipperBallSpeed = 0.001f;
 const float BumperAccelerateBallSpeed = 1.007f;
@@ -308,6 +308,10 @@ class Bumper : public Object2D{
 			if(sqrt(pow(ball.originX-this->getTransformedOriginX(),2)+pow(ball.originZ-this->getTransformedOriginZ(),2)) < this->getRadius()+ballRadius){
 				ball.speedX = -newBallSpeed.y*BumperAccelerateBallSpeed;
 				ball.speedZ = -newBallSpeed.x*BumperAccelerateBallSpeed;
+				if(sqrt(pow(ball.speedX,2)+pow(ball.speedZ,2))>9.0f){
+					ball.speedX = -newBallSpeed.y;
+					ball.speedZ = -newBallSpeed.x;
+				}
 				return ball; 
 			}
 		}  
@@ -673,14 +677,20 @@ class Flipper : public MovingObject2D{
 				glm::vec2 W = ballSpeed - u;
 				glm::vec2 newBallSpeed = W - u;
 
+				//std::cout<<"normal on X"<<normal.y<<" "<<"normal on Y"<<normal.x<<std::endl;
 
 				if(flipperMoving){
-					std::cout<<"AAAAAAAAAAAAAAAAAAAAA";
-					ball.speedX = ball.speedX -coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
-					ball.speedZ = ball.speedZ -coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
+					//std::cout<<"AAAAAAAAAAAAAAAAAAAAA";
+					float velocityModulus = sqrt(pow(ball.speedX,2)+pow(ball.speedY,2));
+					ball.speedX = 3*velocityModulus*normal.y;
+					ball.speedZ = 3*velocityModulus*normal.x;
 				}else{
 					ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed;
 					ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed;
+				}
+				if(sqrt(pow(ball.speedX,2)+pow(ball.speedZ,2))>9.0f){
+					ball.speedX = 9.0f*normal.y;
+					ball.speedZ = 9.0f*normal.x;
 				}
 				return ball; 
 			}
