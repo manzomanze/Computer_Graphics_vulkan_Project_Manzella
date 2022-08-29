@@ -9,22 +9,17 @@ struct UniformBufferObject {
 	alignas(16) glm::mat4 model;
 	alignas(16) glm::mat4 view;
 	alignas(16) glm::mat4 proj;
-	alignas(16) glm::vec3 lightDir;
-	alignas(16) glm::vec3 lightPos;
-	alignas(16) glm::vec3 lightColor;
-	alignas(16) glm::vec3 eyePos;
-	alignas(16) glm::vec4 coneInOutDecayExp;
 };
 
 struct GlobalUniformBufferObject {
-	alignas(16) glm::mat4 model;
-	alignas(16) glm::mat4 view;
-	alignas(16) glm::mat4 proj;
 	alignas(16) glm::vec3 lightDir;
 	alignas(16) glm::vec3 lightPos;
 	alignas(16) glm::vec3 lightColor;
+	alignas(16) glm::vec3 spotlightColor;
+	alignas(16) glm::vec3 spotlightDir;
 	alignas(16) glm::vec3 eyePos;
 	alignas(16) glm::vec4 coneInOutDecayExp;
+	alignas(16) glm::vec4 selector;
 };
 
 
@@ -35,6 +30,7 @@ class MyProject : public BaseProject {
 	
 	// Descriptor Layouts [what will be passed to the shaders]
 	DescriptorSetLayout DSL1;
+	DescriptorSetLayout DSL2;
 
 	// Pipelines [Shader couples]
 	Pipeline P1;
@@ -43,38 +39,54 @@ class MyProject : public BaseProject {
 	Model Body;
 	Texture BodyTexture;
 	DescriptorSet DSBody;
+	DescriptorSet DSBodyubo;
 
 	Model Puller;
 	Texture PullerTexture;
 	DescriptorSet DSPuller;
+	DescriptorSet DSPullerubo;
 
 	Model Ball;
 	Texture BallTexture;
 	DescriptorSet DSBall;
+	DescriptorSet DSBallubo;
+
 
 	Model LeftFlipper;
 	Texture LeftFlipperTexture;
 	DescriptorSet DSLeftFlipper;
+	DescriptorSet DSLeftFlipperubo;
+
 
 	Model RightFlipper;
 	Texture RightFlipperTexture;
 	DescriptorSet DSRightFlipper;
+	DescriptorSet DSRightFlipperubo;
+
 
 	Model LeftBumper;
 	Texture LeftBumperTexture;
 	DescriptorSet DSLeftBumper;
+	DescriptorSet DSLeftBumperubo;
+
 
 	Model CentreBumper;
 	Texture CentreBumperTexture;
 	DescriptorSet DSCentreBumper;
+	DescriptorSet DSCentreBumperubo;
+
 
 	Model RightBumper;
 	Texture RightBumperTexture;
 	DescriptorSet DSRightBumper;
+	DescriptorSet DSRightBumperubo;
+
 
 	Model Floor;
 	Texture FloorTexture;
 	DescriptorSet DSFloor;
+	DescriptorSet DSFloorubo;
+
 	
 	// Here you set the main application parameters
 	void setWindowParameters() {
@@ -85,9 +97,9 @@ class MyProject : public BaseProject {
 		initialBackgroundColor = {0.0f, 0.0f, 0.0f, 1.0f};
 		
 		// Descriptor pool sizes
-		uniformBlocksInPool = 9;
+		uniformBlocksInPool = 18;
 		texturesInPool = 9;
-		setsInPool = 9;
+		setsInPool = 18;
 	}
 	
 	// Here you load and setup all your Vulkan objects
@@ -98,14 +110,18 @@ class MyProject : public BaseProject {
 					// first  element : the binding number
 					// second element : the time of element (buffer or texture)
 					// third  element : the pipeline stage where it will be used
-					{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT},
+					{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS},
 					{1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT}
 				  });
+
+		DSL2.init(this,{
+					{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT}
+				});
 
 		// Pipelines [Shader couples]
 		// The last array, is a vector of pointer to the layouts of the sets that will
 		// be used in this pipeline. The first element will be set 0, and so on..
-		P1.init(this, "shaders/vert.spv", "shaders/frag.spv", {&DSL1});
+		P1.init(this, "shaders/vert.spv", "shaders/frag.spv", {&DSL1,&DSL2});
 
 		// Models, textures and Descriptors (values assigned to the uniforms)
 		Body.init(this, "models/PinballDark/Body2.obj");
@@ -123,6 +139,10 @@ class MyProject : public BaseProject {
 					{1, TEXTURE, 0, &BodyTexture}
 				});
 
+		DSBodyubo.init(this, &DSL2,{
+			{0, UNIFORM, sizeof(UniformBufferObject), nullptr}
+		});
+
 				
 		Puller.init(this, "models/PinballDark/Puller1.obj");
 		PullerTexture.init(this, "textures/StarWarsPinballColors.png");
@@ -130,6 +150,9 @@ class MyProject : public BaseProject {
 		DSPuller.init(this, &DSL1, {
 					{0, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &PullerTexture}
+				});
+		DSPullerubo.init(this, &DSL2,{
+					{0, UNIFORM, sizeof(UniformBufferObject), nullptr}
 				});
 		
 
@@ -141,6 +164,9 @@ class MyProject : public BaseProject {
 					{0, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &BallTexture}
 				});
+		DSBallubo.init(this, &DSL2,{
+			{0, UNIFORM, sizeof(UniformBufferObject), nullptr}
+		});
 
 		LeftFlipper.init(this, "models/PinballDark/LeftFlipper.obj");
 		LeftFlipperTexture.init(this, "textures/StarWarsPinball.png");
@@ -150,6 +176,9 @@ class MyProject : public BaseProject {
 					{0, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &LeftFlipperTexture}
 				});
+		DSLeftFlipperubo.init(this, &DSL2,{
+			{0, UNIFORM, sizeof(UniformBufferObject), nullptr}
+		});
 
 		RightFlipper.init(this, "models/PinballDark/RightFlipper.obj");
 		RightFlipperTexture.init(this, "textures/StarWarsPinball.png");
@@ -159,6 +188,9 @@ class MyProject : public BaseProject {
 					{0, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &RightFlipperTexture}
 				});
+		DSRightFlipperubo.init(this, &DSL2,{
+			{0, UNIFORM, sizeof(UniformBufferObject), nullptr}
+		});
 
 		LeftBumper.init(this, "models/PinballDark/bumper1.obj");
 		LeftBumperTexture.init(this, "textures/StarWarsPinball.png");
@@ -168,6 +200,9 @@ class MyProject : public BaseProject {
 					{0, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &LeftBumperTexture}
 				});
+		DSLeftBumperubo.init(this, &DSL2,{
+			{0, UNIFORM, sizeof(UniformBufferObject), nullptr}
+		});
 
 		CentreBumper.init(this, "models/PinballDark/bumper2.obj");
 		CentreBumperTexture.init(this, "textures/StarWarsPinball.png");
@@ -177,6 +212,9 @@ class MyProject : public BaseProject {
 					{0, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &CentreBumperTexture}
 				});
+		DSCentreBumperubo.init(this, &DSL2,{
+			{0, UNIFORM, sizeof(UniformBufferObject), nullptr}
+		});
 		
 		RightBumper.init(this, "models/PinballDark/bumper3.obj");
 		RightBumperTexture.init(this, "textures/StarWarsPinball.png");
@@ -186,6 +224,9 @@ class MyProject : public BaseProject {
 					{0, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &RightBumperTexture}
 				});
+		DSRightBumperubo.init(this, &DSL2,{
+			{0, UNIFORM, sizeof(UniformBufferObject), nullptr}
+		});
 
 		Floor.init(this, "models/PinballDark/floor.obj");
 		FloorTexture.init(this, "textures/carpettile.jpg");
@@ -195,11 +236,16 @@ class MyProject : public BaseProject {
 					{0, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr},
 					{1, TEXTURE, 0, &FloorTexture}
 				});
+		DSFloorubo.init(this, &DSL2,{
+			{0, UNIFORM, sizeof(UniformBufferObject), nullptr}
+		});
+
 	}
 
 	// Here you destroy all the objects you created!		
 	void localCleanup() {
 		DSBody.cleanup();
+		DSBodyubo.cleanup();
 		BodyTexture.cleanup();
 		Body.cleanup();
 		
@@ -209,35 +255,43 @@ class MyProject : public BaseProject {
 		Puller.cleanup();
 
 		DSBall.cleanup();
+		DSBallubo.cleanup();
 		BallTexture.cleanup();
 		Ball.cleanup();
 
 		DSLeftFlipper.cleanup();
+		DSLeftFlipperubo.cleanup();
 		LeftFlipperTexture.cleanup();
 		LeftFlipper.cleanup();
 
 		DSRightFlipper.cleanup();
+		DSRightFlipperubo.cleanup();
 		RightFlipperTexture.cleanup();
 		RightFlipper.cleanup();
 
 		DSLeftBumper.cleanup();
+		DSLeftBumperubo.cleanup();
 		LeftBumperTexture.cleanup();
 		LeftBumper.cleanup();
 
 		DSCentreBumper.cleanup();
+		DSCentreBumperubo.cleanup();
 		CentreBumperTexture.cleanup();
 		CentreBumper.cleanup();
 
 		DSRightBumper.cleanup();
+		DSRightBumperubo.cleanup();
 		RightBumperTexture.cleanup();
 		RightBumper.cleanup();
 
 		DSFloor.cleanup();
+		DSFloorubo.cleanup();
 		FloorTexture.cleanup();
 		Floor.cleanup();
 
 
 		DSL1.cleanup();
+		DSL2.cleanup();
 		P1.cleanup();
 	}
 	
@@ -263,6 +317,10 @@ class MyProject : public BaseProject {
 						VK_PIPELINE_BIND_POINT_GRAPHICS,
 						P1.pipelineLayout, 0, 1, &DSBody.descriptorSets[currentImage],
 						0, nullptr);
+		vkCmdBindDescriptorSets(commandBuffer,
+						VK_PIPELINE_BIND_POINT_GRAPHICS,
+						P1.pipelineLayout, 1, 1, &DSBodyubo.descriptorSets[currentImage],
+						0, nullptr);
 		
 		// property .indices.size() of models, contains the number of triangles * 3 of the mesh.
 		vkCmdDrawIndexed(commandBuffer,
@@ -278,6 +336,10 @@ class MyProject : public BaseProject {
 		vkCmdBindDescriptorSets(commandBuffer,
 						VK_PIPELINE_BIND_POINT_GRAPHICS,
 						P1.pipelineLayout, 0, 1, &DSPuller.descriptorSets[currentImage],
+						0, nullptr);
+		vkCmdBindDescriptorSets(commandBuffer,
+						VK_PIPELINE_BIND_POINT_GRAPHICS,
+						P1.pipelineLayout, 1, 1, &DSPullerubo.descriptorSets[currentImage],
 						0, nullptr);
 						
 		vkCmdDrawIndexed(commandBuffer,
@@ -295,6 +357,10 @@ class MyProject : public BaseProject {
 						VK_PIPELINE_BIND_POINT_GRAPHICS,
 						P1.pipelineLayout, 0, 1, &DSBall.descriptorSets[currentImage],
 						0, nullptr);
+		vkCmdBindDescriptorSets(commandBuffer,
+						VK_PIPELINE_BIND_POINT_GRAPHICS,
+						P1.pipelineLayout, 1, 1, &DSBallubo.descriptorSets[currentImage],
+						0, nullptr);
 						
 		vkCmdDrawIndexed(commandBuffer,
 					static_cast<uint32_t>(Ball.indices.size()), 1, 0, 0, 0);
@@ -309,6 +375,10 @@ class MyProject : public BaseProject {
 		vkCmdBindDescriptorSets(commandBuffer,
 						VK_PIPELINE_BIND_POINT_GRAPHICS,
 						P1.pipelineLayout, 0, 1, &DSLeftFlipper.descriptorSets[currentImage],
+						0, nullptr);
+		vkCmdBindDescriptorSets(commandBuffer,
+						VK_PIPELINE_BIND_POINT_GRAPHICS,
+						P1.pipelineLayout, 1, 1, &DSLeftFlipperubo.descriptorSets[currentImage],
 						0, nullptr);
 						
 		vkCmdDrawIndexed(commandBuffer,
@@ -325,7 +395,11 @@ class MyProject : public BaseProject {
 						VK_PIPELINE_BIND_POINT_GRAPHICS,
 						P1.pipelineLayout, 0, 1, &DSRightFlipper.descriptorSets[currentImage],
 						0, nullptr);
-						
+		vkCmdBindDescriptorSets(commandBuffer,
+						VK_PIPELINE_BIND_POINT_GRAPHICS,
+						P1.pipelineLayout, 1, 1, &DSRightFlipperubo.descriptorSets[currentImage],
+						0, nullptr);
+
 		vkCmdDrawIndexed(commandBuffer,
 					static_cast<uint32_t>(RightFlipper.indices.size()), 1, 0, 0, 0);
 
@@ -338,6 +412,10 @@ class MyProject : public BaseProject {
 		vkCmdBindDescriptorSets(commandBuffer,
 						VK_PIPELINE_BIND_POINT_GRAPHICS,
 						P1.pipelineLayout, 0, 1, &DSLeftBumper.descriptorSets[currentImage],
+						0, nullptr);
+		vkCmdBindDescriptorSets(commandBuffer,
+						VK_PIPELINE_BIND_POINT_GRAPHICS,
+						P1.pipelineLayout, 1, 1, &DSLeftBumperubo.descriptorSets[currentImage],
 						0, nullptr);
 						
 		vkCmdDrawIndexed(commandBuffer,
@@ -353,7 +431,11 @@ class MyProject : public BaseProject {
 						VK_PIPELINE_BIND_POINT_GRAPHICS,
 						P1.pipelineLayout, 0, 1, &DSCentreBumper.descriptorSets[currentImage],
 						0, nullptr);
-						
+		vkCmdBindDescriptorSets(commandBuffer,
+						VK_PIPELINE_BIND_POINT_GRAPHICS,
+						P1.pipelineLayout, 1, 1, &DSCentreBumperubo.descriptorSets[currentImage],
+						0, nullptr);
+
 		vkCmdDrawIndexed(commandBuffer,
 					static_cast<uint32_t>(CentreBumper.indices.size()), 1, 0, 0, 0);
 
@@ -366,6 +448,10 @@ class MyProject : public BaseProject {
 		vkCmdBindDescriptorSets(commandBuffer,
 						VK_PIPELINE_BIND_POINT_GRAPHICS,
 						P1.pipelineLayout, 0, 1, &DSRightBumper.descriptorSets[currentImage],
+						0, nullptr);
+		vkCmdBindDescriptorSets(commandBuffer,
+						VK_PIPELINE_BIND_POINT_GRAPHICS,
+						P1.pipelineLayout, 1, 1, &DSRightBumperubo.descriptorSets[currentImage],
 						0, nullptr);
 						
 		vkCmdDrawIndexed(commandBuffer,
@@ -380,6 +466,10 @@ class MyProject : public BaseProject {
 		vkCmdBindDescriptorSets(commandBuffer,
 						VK_PIPELINE_BIND_POINT_GRAPHICS,
 						P1.pipelineLayout, 0, 1, &DSFloor.descriptorSets[currentImage],
+						0, nullptr);
+		vkCmdBindDescriptorSets(commandBuffer,
+						VK_PIPELINE_BIND_POINT_GRAPHICS,
+						P1.pipelineLayout, 1, 1, &DSFloorubo.descriptorSets[currentImage],
 						0, nullptr);
 						
 		vkCmdDrawIndexed(commandBuffer,
@@ -454,6 +544,8 @@ class MyProject : public BaseProject {
 		static float ballZ = 0.0f;
 		static float ballXstart = 3.5f;
 		static float ballZstart = -2.0f;
+
+		static int selector;
 		
 		//definition of physics interacting objects
 
@@ -636,6 +728,42 @@ class MyProject : public BaseProject {
 			ballZ = ballZ-2.0f*deltaT;
 		}
 
+		if(glfwGetKey(window,GLFW_KEY_Q)){
+			if(selector==2) {
+				selector = 0;
+			}else{
+				selector ++;
+			}
+		}
+
+
+		switch(selector) {
+		  case 0:
+			gubo.selector = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
+			gubo.lightDir = glm::vec3(-0.4830f, 0.8365f, -0.2588f);
+			gubo.lightPos = glm::vec3(3.0f, 5.0f, 0.0f);
+			gubo.lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+			gubo.eyePos = glm::vec3(5.0f, 3.0f, 0.0f);
+			gubo.coneInOutDecayExp = glm::vec4(0.9f, 0.92f, 2.0f, 1.0f);
+			break;
+		  case 1:
+			gubo.selector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+			gubo.lightDir = glm::vec3(-0.4830f, 0.8365f, -0.2588f);
+			gubo.lightPos = glm::vec3(3.0f, 5.0f, 0.0f);
+			gubo.lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+			gubo.eyePos = glm::vec3(5.0f, 3.0f, 0.0f);
+			gubo.coneInOutDecayExp = glm::vec4(0.9f, 0.92f, 2.0f, 1.0f);
+			break;
+		  case 2:
+			gubo.selector = glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
+			gubo.lightDir = glm::vec3(-0.4830f, 0.8365f, -0.2588f);
+
+			gubo.lightPos = glm::vec3(3.0f, 5.0f, 0.0f);
+			gubo.lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+			gubo.eyePos = glm::vec3(5.0f, 3.0f, 0.0f);
+			gubo.coneInOutDecayExp = glm::vec4(0.9f, 0.92f, 2.0f, 1.0f);
+			break;
+		}
 		 
 
 		
@@ -699,9 +827,9 @@ class MyProject : public BaseProject {
 
 		
 
-		gubo.model = BodyPosition;
+		ubo.model = BodyPosition;
 		// Camera Position parallell to the playing plane
-		gubo.view = glm::lookAt(glm::vec3(5.0f+cameraX+valueX, 0.0f+cameraY+valueY, cameraZ+valueZ),
+		ubo.view = glm::lookAt(glm::vec3(5.0f+cameraX+valueX, 0.0f+cameraY+valueY, cameraZ+valueZ),
 							   glm::vec3(0.0f+cameraX, 0.0f+cameraY, 0.0f+cameraZ),
 							   glm::vec3(0.0f, 1.0f, 0.0f))*
 
@@ -713,20 +841,14 @@ class MyProject : public BaseProject {
 								glm::radians(cameraYaw),
 								glm::vec3(0.0f, 1.0f, 0.0f));
 		
-		gubo.proj = glm::perspective(glm::radians(70.0f),
+		ubo.proj = glm::perspective(glm::radians(70.0f),
 						swapChainExtent.width / (float) swapChainExtent.height,
 						0.1f, 100.0f);
-		gubo.proj[1][1] *= -1;
+		ubo.proj[1][1] *= -1;
 
 		static float time2 = 0;
 		time2 = time2 + deltaT;
 
-		gubo.lightDir = glm::vec3(-0.4830f, 0.8365f, -0.2588f);
-		/* glm::vec3(cos(glm::radians(0.0f))  * cos(glm::radians(30.0f*time2)) , sin(glm::radians(90.0f)), 	cos(glm::radians(90.0f))  * sin(glm::radians(30.0f*time2)) ); */
-		gubo.lightPos = glm::vec3(3.0f, 5.0f, 0.0f);
-		gubo.lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		gubo.eyePos = glm::vec3(5.0f, 3.0f, 0.0f);
-		gubo.coneInOutDecayExp = glm::vec4(0.9f, 0.92f, 2.0f, 1.0f);
 		
 		void* data;
 
@@ -737,8 +859,13 @@ class MyProject : public BaseProject {
 		memcpy(data, &gubo, sizeof(gubo));
 		vkUnmapMemory(device, DSBody.uniformBuffersMemory[0][currentImage]);
 
+		vkMapMemory(device, DSBodyubo.uniformBuffersMemory[0][currentImage], 0,
+							sizeof(ubo), 0, &data);
+		memcpy(data, &ubo, sizeof(ubo));
+		vkUnmapMemory(device, DSBodyubo.uniformBuffersMemory[0][currentImage]);
+
 		//Puller Position
-		gubo.model = PullerCurrentPosition*
+		ubo.model = PullerCurrentPosition*
 					glm::rotate(glm::mat4(1.0f),
 								glm::radians(-90.0f),
 								glm::vec3(0.0f, 0.0f, 1.0f));
@@ -747,60 +874,102 @@ class MyProject : public BaseProject {
 		memcpy(data, &gubo, sizeof(gubo));
 		vkUnmapMemory(device, DSPuller.uniformBuffersMemory[0][currentImage]);
 
+		vkMapMemory(device, DSPullerubo.uniformBuffersMemory[0][currentImage], 0,
+							sizeof(ubo), 0, &data);
+		memcpy(data, &ubo, sizeof(ubo));
+		vkUnmapMemory(device, DSPullerubo.uniformBuffersMemory[0][currentImage]);
+
 		//Ball Position
-		gubo.model = BallCurrentPosition;
+		ubo.model = BallCurrentPosition;
 					
 		vkMapMemory(device, DSBall.uniformBuffersMemory[0][currentImage], 0,
 							sizeof(gubo), 0, &data);
 		memcpy(data, &gubo, sizeof(gubo));
 		vkUnmapMemory(device, DSBall.uniformBuffersMemory[0][currentImage]);
 
+		vkMapMemory(device, DSBallubo.uniformBuffersMemory[0][currentImage], 0,
+							sizeof(ubo), 0, &data);
+		memcpy(data, &ubo, sizeof(ubo));
+		vkUnmapMemory(device, DSBallubo.uniformBuffersMemory[0][currentImage]);
+
 		//Left Flipper Position
-		gubo.model = LeftFlipperTest.getResultingTransformationMatrix();
+		ubo.model = LeftFlipperTest.getResultingTransformationMatrix();
 					
 		vkMapMemory(device, DSLeftFlipper.uniformBuffersMemory[0][currentImage], 0,
 							sizeof(gubo), 0, &data);
 		memcpy(data, &gubo, sizeof(gubo));
 		vkUnmapMemory(device, DSLeftFlipper.uniformBuffersMemory[0][currentImage]);
 
+		vkMapMemory(device, DSLeftFlipperubo.uniformBuffersMemory[0][currentImage], 0,
+							sizeof(ubo), 0, &data);
+		memcpy(data, &ubo, sizeof(ubo));
+		vkUnmapMemory(device, DSLeftFlipperubo.uniformBuffersMemory[0][currentImage]);
+
 		//Right Flipper Position
-		gubo.model = RightFlipperTest.getResultingTransformationMatrix();
+		ubo.model = RightFlipperTest.getResultingTransformationMatrix();
 					
 		vkMapMemory(device, DSRightFlipper.uniformBuffersMemory[0][currentImage], 0,
 							sizeof(gubo), 0, &data);
 		memcpy(data, &gubo, sizeof(gubo));
 		vkUnmapMemory(device, DSRightFlipper.uniformBuffersMemory[0][currentImage]);
 
+		vkMapMemory(device, DSRightFlipperubo.uniformBuffersMemory[0][currentImage], 0,
+							sizeof(ubo), 0, &data);
+		memcpy(data, &ubo, sizeof(ubo));
+		vkUnmapMemory(device, DSRightFlipperubo.uniformBuffersMemory[0][currentImage]);
+
 		// Left Bumper
-		gubo.model = LeftBumperTest.getResultingTransformationMatrix();
+		ubo.model = LeftBumperTest.getResultingTransformationMatrix();
 					
 		vkMapMemory(device, DSLeftBumper.uniformBuffersMemory[0][currentImage], 0,
 							sizeof(gubo), 0, &data);
 		memcpy(data, &gubo, sizeof(gubo));
 		vkUnmapMemory(device, DSLeftBumper.uniformBuffersMemory[0][currentImage]);
 
+		vkMapMemory(device, DSLeftBumperubo.uniformBuffersMemory[0][currentImage], 0,
+							sizeof(ubo), 0, &data);
+		memcpy(data, &ubo, sizeof(ubo));
+		vkUnmapMemory(device, DSLeftBumperubo.uniformBuffersMemory[0][currentImage]);
+
 		// Centre Bumper
-		gubo.model = CentreBumperTest.getResultingTransformationMatrix();
+		ubo.model = CentreBumperTest.getResultingTransformationMatrix();
 					
 		vkMapMemory(device, DSCentreBumper.uniformBuffersMemory[0][currentImage], 0,
 							sizeof(gubo), 0, &data);
 		memcpy(data, &gubo, sizeof(gubo));
 		vkUnmapMemory(device, DSCentreBumper.uniformBuffersMemory[0][currentImage]);
 
+		vkMapMemory(device, DSCentreBumperubo.uniformBuffersMemory[0][currentImage], 0,
+							sizeof(ubo), 0, &data);
+		memcpy(data, &ubo, sizeof(ubo));
+		vkUnmapMemory(device, DSCentreBumperubo.uniformBuffersMemory[0][currentImage]);
+
 		// Right Bumper
-		gubo.model = RightBumperTest.getResultingTransformationMatrix();
+		ubo.model = RightBumperTest.getResultingTransformationMatrix();
 					
 		vkMapMemory(device, DSRightBumper.uniformBuffersMemory[0][currentImage], 0,
 							sizeof(gubo), 0, &data);
 		memcpy(data, &gubo, sizeof(gubo));
 		vkUnmapMemory(device, DSRightBumper.uniformBuffersMemory[0][currentImage]);
 
-		gubo.model = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,-8.0f,0.0f));
+		vkMapMemory(device, DSRightBumperubo.uniformBuffersMemory[0][currentImage], 0,
+							sizeof(ubo), 0, &data);
+		memcpy(data, &ubo, sizeof(ubo));
+		vkUnmapMemory(device, DSRightBumperubo.uniformBuffersMemory[0][currentImage]);
+
+
+		// Floor
+		ubo.model = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,-8.0f,0.0f));
 					
 		vkMapMemory(device, DSFloor.uniformBuffersMemory[0][currentImage], 0,
 							sizeof(gubo), 0, &data);
 		memcpy(data, &gubo, sizeof(gubo));
 		vkUnmapMemory(device, DSFloor.uniformBuffersMemory[0][currentImage]);
+
+		vkMapMemory(device, DSFloorubo.uniformBuffersMemory[0][currentImage], 0,
+							sizeof(ubo), 0, &data);
+		memcpy(data, &ubo, sizeof(ubo));
+		vkUnmapMemory(device, DSFloorubo.uniformBuffersMemory[0][currentImage]);
 	}	
 };
 
