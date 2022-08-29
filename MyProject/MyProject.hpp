@@ -37,11 +37,11 @@
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
-const float ballRadius = 0.20f;
+const float ballRadius = 0.15f;
 const float sideWallDepth = 0.30f;
-const float effectOfCollisionOnSpeed = 0.99999;
+const float effectOfCollisionOnSpeed = 0.97;
 const float flipperRotateSpeed = 200.0f;
-const float coeffiecientOfFlipperBallSpeed = 0.007f;
+const float coeffiecientOfFlipperBallSpeed = 0.001f;
 const float BumperAccelerateBallSpeed = 1.007f;
 
 // Lesson 22.0
@@ -474,15 +474,15 @@ class Wall : public MovingObject2D{
 		/* std::cout<< "rightwall X: min"<<this->getminX()<< " max "<< this->getmaxX() <<" min Z "<< this->getminZ() <<" max  " <<this->getmaxZ() <<std::endl;
 			std::cout<< "rightwall Y: min"<<this->getminY()<< " max "<< this->getminY()<<std::endl; */
 	
-		for(int i = 0; i<angleResolution;i++){
-			if((ball.originX - glm::sin(i * angleIncrement)*ballRadius <= this->getTransformedmaxX() && ball.originX - glm::sin(i * angleIncrement)*ballRadius >= this->getTransformedminX()) &&
-				(ball.originZ - glm::cos(i * angleIncrement)*ballRadius <= this->getTransformedmaxZ() && ball.originZ - glm::cos(i * angleIncrement)*ballRadius >= this->getTransformedminZ()) /* && 
+		
+			if((ball.originX <= this->getTransformedmaxX() && ball.originX  >= this->getTransformedminX()) &&
+				(ball.originZ  <= this->getTransformedmaxZ() && ball.originZ  >= this->getTransformedminZ()) /* && 
 				(ball.originY  <= this->getmaxY() && ball.originY  >= this->getminY()) */){
 					ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed;
 					ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed;
 					return ball;
 			}
-		}	
+			
 
 		return ball;     
 	}
@@ -653,7 +653,7 @@ class Flipper : public MovingObject2D{
 
 
 	MovingRotationalObjectDimensions Flipper::bounceBall(MovingRotationalObjectDimensions ball) {
-		float angleResolution = 4;
+		float angleResolution = 32;
 		float angleIncrement = 360.0f / angleResolution;
 			
 		// This should give us the angle of the ball movement with respect to  natural axis with Z new to the right and Xnew ging away from the User
@@ -661,15 +661,8 @@ class Flipper : public MovingObject2D{
 		/* std::cout<<ballMovementAngle<<std::endl; */
 
 		
-
-
-	
-		
-
-
-		for(int i = 0; i<angleResolution;i++){
-			float testPointX = ball.originX - glm::sin(i * angleIncrement)*ballRadius;
-			float testPointZ = ball.originZ - glm::cos(i * angleIncrement)*ballRadius;
+			float testPointX = ball.originX;
+			float testPointZ = ball.originZ;
 
 			if(pointIsInside(testPointX,testPointZ)){
 				float distanceFromFlipperFulcrum = calculateDistanceFromFlipperFulcrum(testPointX,testPointZ,this->getResultingTransformationVector());
@@ -680,16 +673,19 @@ class Flipper : public MovingObject2D{
 				glm::vec2 W = ballSpeed - u;
 				glm::vec2 newBallSpeed = W - u;
 
-				ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed;
-				ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed;
+
 				if(flipperMoving){
+					std::cout<<"AAAAAAAAAAAAAAAAAAAAA";
 					ball.speedX = ball.speedX -coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
 					ball.speedZ = ball.speedZ -coeffiecientOfFlipperBallSpeed*distanceFromFlipperFulcrum*flipperRotateSpeed;
+				}else{
+					ball.speedX = -newBallSpeed.y*effectOfCollisionOnSpeed;
+					ball.speedZ = -newBallSpeed.x*effectOfCollisionOnSpeed;
 				}
 				return ball; 
 			}
 		
-		}  
+		
 
 		return ball; 
 	  

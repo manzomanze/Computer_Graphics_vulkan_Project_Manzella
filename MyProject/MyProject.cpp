@@ -428,14 +428,14 @@ class MyProject : public BaseProject {
 		static float leftFlipperMargin = 1.0f;
 		static float rightFlipperMargin = -1.2f;
 
-		float FlipperBottomLeftX = 0.174519f;
-		float FlipperBottomLeftZ = 0.167087f;
-		float FlipperBottomRightX = 0.174519f;
-		float FlipperBottomRightZ = -0.167087f;
-		float FlipperTopLeftX = -0.919164f;
-		float FlipperTopLeftZ = 0.092294f;
-		float FlipperTopRightX = -0.919164f;
-		float FlipperTopRightZ = -0.092294f;
+		float FlipperBottomLeftX = 0.174519f+ballRadius;
+		float FlipperBottomLeftZ = 0.167087f+ballRadius;
+		float FlipperBottomRightX = 0.174519f+ballRadius;
+		float FlipperBottomRightZ = -0.167087f-ballRadius;
+		float FlipperTopLeftX = -0.919164f-ballRadius;
+		float FlipperTopLeftZ = 0.092294f+ballRadius;
+		float FlipperTopRightX = -0.919164f-ballRadius;
+		float FlipperTopRightZ = -0.092294f-ballRadius;
 
 
 		static float ballX = 0.0f;
@@ -450,22 +450,22 @@ class MyProject : public BaseProject {
 
 		static float leftFlipperRotate = 0.0f;
 		static float rightFlipperRotate = 0.0f;
-		static float gravityconstant = 1.0f;
+		static float gravityconstant = 2.0f;
 		static float activeGravity = 0.0f;
 		
 		static auto previousReleaseValueOfSpace = GLFW_RELEASE;
 
 		bool leftFlipperMovingUp, leftFlipperMovingDown;
 
-		Wall TopWall(topXMargin-sideWallDepth, topXMargin, bottomYMargin, 	topYMargin, rightZMargin, leftZMargin, 3.14/2, "top-wall", BodyPosition);
+		Wall TopWall(topXMargin, topXMargin+ballRadius, bottomYMargin, 	topYMargin, rightZMargin, leftZMargin, 3.14/2, "top-wall", BodyPosition);
 		
-		Wall RightWall(topXMargin, bottomXMargin, bottomYMargin, topYMargin, rightZMargin-sideWallDepth, rightZMargin, 0.0f, "right-wall", BodyPosition);
+		Wall RightWall(topXMargin, bottomXMargin, bottomYMargin, topYMargin, rightZMargin, rightZMargin +ballRadius, 0.0f, "right-wall", BodyPosition);
 
-		Wall LeftWall(topXMargin, bottomXMargin, bottomYMargin, topYMargin, leftZMargin, leftZMargin+sideWallDepth, 0.0f, "right-wall", BodyPosition);
+		Wall LeftWall(topXMargin, bottomXMargin, bottomYMargin, topYMargin, leftZMargin - ballRadius, leftZMargin, 3.14f, "left-wall", BodyPosition);
 		
-		Wall BottomRightWall(bottomXMargin, bottomXMargin+sideWallDepth, bottomYMargin, topYMargin, rightZMargin, rightFlipperMargin, -3.14/2, "bottom-right-wall", BodyPosition);
+		Wall BottomRightWall(bottomXMargin- ballRadius, bottomXMargin, bottomYMargin, topYMargin, rightZMargin, rightFlipperMargin, -3.14/2, "bottom-right-wall", BodyPosition);
 
-		Wall BottomLeftWall(bottomXMargin, bottomXMargin+sideWallDepth, bottomYMargin, topYMargin, leftFlipperMargin, leftZMargin, -3.14/2, "bottom-right-wall", BodyPosition);
+		Wall BottomLeftWall(bottomXMargin- ballRadius, bottomXMargin, bottomYMargin, topYMargin, leftFlipperMargin, leftZMargin, -3.14/2, "bottom-right-wall", BodyPosition);
 				
 		Flipper LeftFlipperTest(FlipperBottomLeftX, FlipperBottomLeftZ, FlipperBottomRightX, FlipperBottomRightZ, FlipperTopLeftX, FlipperTopLeftZ, FlipperTopRightX, FlipperTopRightZ, leftFlipperRotate-120.0f, "left-flipper",bottomXMargin-0.7f, ballRadius,leftFlipperMargin,BodyPosition);
 
@@ -590,15 +590,23 @@ class MyProject : public BaseProject {
 		/* right flipper rotate */
 		{
 			if(glfwGetKey(window,GLFW_KEY_H)){
-				
-				if(rightFlipperRotate>=-60.0f){
+				if(rightFlipperRotate==-60.0f){
+					RightFlipperTest.setFlipperMoving(false);
+				}
+				if(rightFlipperRotate>-60.0f){
 					rightFlipperRotate = rightFlipperRotate-flipperRotateSpeed*deltaT;
+					RightFlipperTest.setFlipperMoving(true);
 					
 				}
 			}else{
+				if(rightFlipperRotate==0.0f){
+					RightFlipperTest.setFlipperMoving(false);
+					
+				}
 				if(rightFlipperRotate<=0.0f){
 					rightFlipperRotate = rightFlipperRotate+flipperRotateSpeed*deltaT;
-					
+					RightFlipperTest.setFlipperMoving(true);
+
 				}
 			}
 
