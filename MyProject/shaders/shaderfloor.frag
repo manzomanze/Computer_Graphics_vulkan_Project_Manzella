@@ -50,16 +50,15 @@ void main() {
 	const vec3  diffColor = texture(texSampler, fragTexCoord).rgb;
 	const vec3  specColor = vec3(1.0f, 1.0f, 1.0f);
 	const float specPower = 150.0f;
-	vec3 EyeDir = normalize(ubo.eyePos.xyz - fragPos);
-
+	const vec3  L = vec3(-0.4830f, 0.8365f, -0.2588f);
+	
 	vec3 N = normalize(fragNorm);
-	vec3 R = EyeDir;
+	vec3 R = -reflect(L, N);
+	vec3 V = normalize(fragViewDir);
 	
 	vec3 lD = point_light_dir(fragPos);
 
 	vec3 lC = point_light_color(fragPos);
-
-	vec3 V = -reflect(lD, N);
 	// Lambert diffuse
 	vec3 diffuse  = diffColor * max(dot(N, lD),0.0f);
 	//
@@ -68,5 +67,5 @@ void main() {
 	// Hemispheric ambient
 	vec3 ambient  = (vec3(0.1f,0.1f, 0.1f) * (1.0f + N.y) + vec3(0.0f,0.0f, 0.1f) * (1.0f - N.y)) * diffColor;
 	
-	outColor = vec4(ambient + diffuse + specular, 1.0f);
+	outColor = vec4(ambient + diffuse, 1.0f);
 }

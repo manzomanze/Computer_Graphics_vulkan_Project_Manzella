@@ -178,7 +178,7 @@ class MyProject : public BaseProject {
 				});
 
 		Floor.init(this, "models/PinballDark/floor.obj");
-		FloorTexture.init(this, "textures/horizontal-wood-plank-texture.jpg");
+		FloorTexture.init(this, "textures/carpettile.jpg");
 
 
 		DSFloor.init(this, &DSL1, {
@@ -780,7 +780,7 @@ class MyProject : public BaseProject {
 		memcpy(data, &ubo, sizeof(ubo));
 		vkUnmapMemory(device, DSRightBumper.uniformBuffersMemory[0][currentImage]);
 
-		ubo.model = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,-3.0f,0.0f));
+		ubo.model = glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,-8.0f,0.0f));
 					
 		vkMapMemory(device, DSFloor.uniformBuffersMemory[0][currentImage], 0,
 							sizeof(ubo), 0, &data);
